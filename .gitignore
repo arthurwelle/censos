@@ -11,6 +11,11 @@
 /scripts/
 /docs/
 
+# varredura do catalogo inteiro em PNG, para conferir no olho
+# (scripts/gerar_todas_figuras.mjs). Sao ~95 figuras de alguns MB cada e nao
+# fazem parte do site.
+/IMG/
+
 # geodados fonte: grandes demais para o repositorio (limite de 100 MB do
 # GitHub). Ficam em C:/Users/arthur/Desktop/Censo2022/GEO e sao a entrada de
 # scripts/gerar_tiles.R. O que o site publica sao os PMTiles em site/geo/.

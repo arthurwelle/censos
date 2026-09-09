@@ -57,7 +57,7 @@
         <tbody>
           <tr><td>2022</td><td>microdados de área de ponderação, IBGE</td>
               <td>DuckDB direto no parquet, na máquina</td></tr>
-          <tr><td>1970–2010</td><td>microdados da amostra, IBGE</td>
+          <tr><td>1970–2010</td><td>microdados da amostra, IBGE, pelo <a href="https://basedosdados.org/dataset/br-ibge-censo-demografico" target="_blank" rel="noopener">Base dos Dados</a></td>
               <td>BigQuery, formato longo</td></tr>
           <tr><td>1980, parte</td><td>microdado original em SPSS (Cesit/Unicamp),
               26 estados convertidos em parquet</td>
@@ -65,6 +65,14 @@
               indicadores que ela não tem como produzir</td></tr>
         </tbody>
       </table>
+
+      <p>Os cinco censos de 1970 a 2010 são lidos do espelho que a <a href="https://basedosdados.org/dataset/br-ibge-censo-demografico" target="_blank" rel="noopener">Base dos Dados</a>
+      mantém no BigQuery (<code>br_ibge_censo_demografico</code>). O dado é o
+      do IBGE; o que a Base dos Dados faz é deixá-lo consultável em SQL, sem
+      baixar nada — o que permitiu extrair seis censos de uma vez, e voltar a
+      eles a cada correção sem refazer nenhum download. As armadilhas de
+      universo e de valor sentinela descritas abaixo são do microdado original,
+      e não da intermediação.</p>
 
       <p>Toda proporção é <strong>ponderada pelo peso amostral</strong>
       (<code>P0111</code> em 2022, <code>peso_amostral</code>, <code>v054</code>,

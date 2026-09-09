@@ -14,7 +14,7 @@ import { map, updateChoropleth, initInteracao, initModoLimpo, setCamada,
          setModoLimpo, modoLimpoLigado, applyMapTheme,
          montarCanvas, baixarCanvas, comporGrade,
          bboxDaUnidade, unirBbox, enquadrarParaCaptura,
-         capturarRecorte } from './map.js';
+         capturarRecorte, BBOX_CONTINENTAL } from './map.js';
 import { initTema } from './tema.js';
 
 let indAtivo = INDICADORES.find((i) => i.default) ?? INDICADORES[0];
@@ -699,7 +699,12 @@ async function montarFacet(anos, { titulo, creditos }) {
       }
       bb = unirBbox(caixas);
     }
-    if (!bb) bb = map.getBounds().toArray();   // sem recorte: o que está na tela
+    // Sem recorte, a grade e do Brasil CONTINENTAL, e nao do que esta na tela.
+    // A janela e retangular e carrega margem; e o bbox real do pais vai ate a
+    // longitude -28,85, porque Trindade e Fernando de Noronha sao dele. Nos
+    // dois casos cada painel sairia com uma faixa de oceano do lado, e numa
+    // grade de quatro isso e quase um painel inteiro de nada.
+    if (!bb) bb = BBOX_CONTINENTAL;
 
     const paineis = [];
     let recorte = null;
@@ -927,11 +932,21 @@ function preencherTextos() {
   const anos = editandoFigura ? anosMarcados() : [];
   const varios = anos.length > 1;
 
-  // só prefixa se o usuário ainda não editou. Sem unidade recortada não entra
-  // o separador vazio, que sairia como "Indicador ·  · 1991".
+  // O título tem de dizer as QUATRO escolhas que fazem a figura: qual
+  // indicador, sobre que recorte, desenhado em que unidade e de que censo.
+  // Faltava a unidade -- "Alfabetização · Minas Gerais · 1991" não diz se
+  // cada polígono é um município ou uma área de ponderação, e os dois mapas
+  // são diferentes. Sem recorte entra 'Brasil', que numa figura solta, longe
+  // do site, deixa de ser óbvio.
+  //
+  // O separador vazio some com o filter: sem ele sairia "Indicador ·  · 1991".
   if (!t.dataset.editado) {
-    t.textContent = [indAtivo.label, tituloFoco, varios ? '' : ano()]
-      .filter(Boolean).join(' · ');
+    t.textContent = [
+      indAtivo.label,
+      tituloFoco || 'Brasil',
+      `por ${camada().label.toLowerCase()}`,
+      varios ? '' : ano(),
+    ].filter(Boolean).join(' · ');
   }
   if (!f.dataset.editado) {
     const fonte = varios
