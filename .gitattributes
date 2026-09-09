@@ -1,0 +1,13 @@
+# Sem isto, o git decide texto-ou-binario por heuristica (procura NUL nos
+# primeiros 8000 bytes) e, no Windows com autocrlf, converte finais de linha do
+# que ele achar que e texto. Num PMTiles de 44 MB isso corromperia a malha em
+# silencio: o mapa continuaria carregando e simplesmente nao desenharia nada.
+# Declarar e mais barato que confiar na heuristica.
+*.pmtiles  binary
+*.woff2    binary
+*.png      binary
+*.jpg      binary
+*.gz       binary
+
+# o resto e texto, normalizado em LF no repositorio
+*           text=auto eol=lf

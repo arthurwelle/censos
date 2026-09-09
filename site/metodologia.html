@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metodologia · Censos Demográficos 1970-2022</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Crect x='2.5' y='2.5' width='5' height='5' fill='%23440154'/%3E%3Crect x='8.5' y='2.5' width='5' height='5' fill='%2331688e'/%3E%3Crect x='2.5' y='8.5' width='5' height='5' fill='%2335b779'/%3E%3Crect x='8.5' y='8.5' width='5' height='5' fill='%23fde725'/%3E%3C/svg%3E">
+  <script>
+    try {
+      const t = localStorage.getItem('tema');
+      if (t && t !== 'escuro') document.documentElement.dataset.theme = t;
+    } catch { /* modo privado */ }
+  </script>
+  <!-- o @font-face esta no style.css, entao o navegador so descobre a fonte
+       depois de baixar e ler a folha inteira. O preload adianta o subconjunto
+       latin, que e o que cobre o portugues, e tira o lampejo de texto na fonte
+       de sistema. 'crossorigin' e obrigatorio em fonte mesmo na mesma origem. -->
+  <link rel="preload" as="font" type="font/woff2"
+        href="./fonts/ahn-latin.woff2" crossorigin>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="pagina-texto">
+  <header id="app-header">
+    <h1>Metodologia<span class="h1-sub">fórmula de cada indicador</span></h1>
+    <div id="sel-ano" role="group" aria-label="Censo"></div>
+    <input id="busca" type="search" placeholder="filtrar por indicador ou variável"
+           aria-label="Filtrar">
+    <a class="link-voltar" href="./metodologia-geral.html">← como isto foi feito</a>
+    <a class="link-voltar" href="./index.html">← mapa</a>
+    <button id="btn-tema" type="button" title="Mudar para tema claro"></button>
+  </header>
+
+  <main id="met-main">
+    <p id="met-intro"></p>
+    <p id="met-aviso">
+      <strong>Esta página é gerada a partir do código que roda</strong>, não
+      escrita à mão: as fórmulas saem do SQL da extração
+      (<code>scripts/gerar_metodologia.py</code>) e o significado dos códigos vem
+      do layout e do dicionário do IBGE. Se a fórmula aqui
+      estiver errada, o número no mapa está errado do mesmo jeito — é esse o
+      ponto.
+    </p>
+    <p id="met-conflito" hidden></p>
+    <div id="met-lista"></div>
+  </main>
+
+  <script src="./js/metodologia.js" type="module"></script>
+</body>
+</html>

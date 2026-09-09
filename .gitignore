@@ -1,0 +1,39 @@
+# Este repositorio publica O SITE, e so ele.
+#
+# O que PRODUZ o site fica de fora por decisao, nao por tamanho: o notebook de
+# extracao e os scripts de R e Python apontam por caminho absoluto para
+# microdados de acesso controlado na maquina local, e o que se publica aqui e o
+# resultado agregado por municipio, estado e area de ponderacao.
+#
+# Sobe: site/ (dados, tiles, JS, CSS, fontes e as tres paginas), o workflow que
+# faz o deploy, o README e este arquivo.
+/Analise/
+/scripts/
+/docs/
+
+# geodados fonte: grandes demais para o repositorio (limite de 100 MB do
+# GitHub). Ficam em C:/Users/arthur/Desktop/Censo2022/GEO e sao a entrada de
+# scripts/gerar_tiles.R. O que o site publica sao os PMTiles em site/geo/.
+/Analise/*/GEO/*.geoparquet
+
+# saidas intermediarias de render que nao devem ficar na pasta
+*.html
+!site/*.html
+*.log
+Rplots.pdf
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+*.Rproj
+
+# node (usado so para testes locais do site)
+node_modules/
+
+# config local do Claude Code
+/.claude/
+
+# misc
+Thumbs.db
+desktop.ini

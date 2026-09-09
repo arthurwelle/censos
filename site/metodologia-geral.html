@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Como isto foi feito · Censos Demográficos 1970-2022</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Crect x='2.5' y='2.5' width='5' height='5' fill='%23440154'/%3E%3Crect x='8.5' y='2.5' width='5' height='5' fill='%2331688e'/%3E%3Crect x='2.5' y='8.5' width='5' height='5' fill='%2335b779'/%3E%3Crect x='8.5' y='8.5' width='5' height='5' fill='%23fde725'/%3E%3C/svg%3E">
+  <script>
+    try {
+      const t = localStorage.getItem('tema');
+      if (t && t !== 'escuro') document.documentElement.dataset.theme = t;
+    } catch { /* modo privado */ }
+  </script>
+  <!-- o @font-face esta no style.css, entao o navegador so descobre a fonte
+       depois de baixar e ler a folha inteira. O preload adianta o subconjunto
+       latin, que e o que cobre o portugues, e tira o lampejo de texto na fonte
+       de sistema. 'crossorigin' e obrigatorio em fonte mesmo na mesma origem. -->
+  <link rel="preload" as="font" type="font/woff2"
+        href="./fonts/ahn-latin.woff2" crossorigin>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="pagina-texto">
+  <header id="app-header">
+    <h1>Como isto foi feito<span class="h1-sub">decisões, limites e o que não deu certo</span></h1>
+    <a class="link-voltar" href="./metodologia.html">fórmula de cada indicador →</a>
+    <a class="link-voltar" href="./index.html">← mapa</a>
+    <button id="btn-tema" type="button" title="Mudar para tema claro"></button>
+  </header>
+
+  <main id="met-main" class="texto-longo">
+
+    <p class="lede">Seis censos, de 1970 a 2022, cada um desenhado na malha do
+    seu próprio ano. Esta página conta como os números foram construídos, o que
+    foi verificado, e — principalmente — onde estão os buracos. A página de
+    <a href="./metodologia.html">fórmulas</a> mostra a conta de cada indicador,
+    variável por variável; esta aqui trata do que atravessa todos eles.</p>
+
+    <nav class="sumario" aria-label="Nesta página">
+      <a href="#fontes">Fontes</a>
+      <a href="#armadilha">A armadilha principal</a>
+      <a href="#validacao">Como se valida</a>
+      <a href="#geografia">Geografia</a>
+      <a href="#ap2000">Área de ponderação de 2000</a>
+      <a href="#deflator">Rendimento em reais de 2026</a>
+      <a href="#escala">Escala de cor</a>
+      <a href="#recorte">Recorte e figura</a>
+      <a href="#piramide">Pirâmide etária</a>
+      <a href="#quarentena">O que está em quarentena</a>
+      <a href="#limites">O que este mapa não é</a>
+    </nav>
+
+    <!-- ============================================================ -->
+    <section id="fontes">
+      <h2>Fontes</h2>
+      <table class="tab">
+        <thead><tr><th>censo</th><th>de onde vem</th><th>como é lido</th></tr></thead>
+        <tbody>
+          <tr><td>2022</td><td>microdados de área de ponderação, IBGE</td>
+              <td>DuckDB direto no parquet, na máquina</td></tr>
+          <tr><td>1970–2010</td><td>microdados da amostra, IBGE</td>
+              <td>BigQuery, formato longo</td></tr>
+          <tr><td>1980, parte</td><td>microdado original em SPSS (Cesit/Unicamp),
+              26 estados convertidos em parquet</td>
+              <td>os 53 municípios que a extração não localiza, e 24
+              indicadores que ela não tem como produzir</td></tr>
+        </tbody>
+      </table>
+
+      <p>Toda proporção é <strong>ponderada pelo peso amostral</strong>
+      (<code>P0111</code> em 2022, <code>peso_amostral</code>, <code>v054</code>,
+      <code>v604</code> conforme o ano), nunca contagem de linha. Média e razão
+      saem de soma de numerador e denominador, e a fórmula é reaplicada depois da
+      agregação — somar percentuais municipais daria peso igual a São Paulo e a
+      Borá.</p>
+
+      <p><strong>Mediana é a exceção.</strong> A mediana de um estado não sai das
+      medianas dos seus municípios, então ela é calculada direto do microdado em
+      cada nível geográfico, por soma acumulada de peso. Nunca por
+      <code>PERCENTILE_CONT</code>, que ignora o peso amostral e devolveria a
+      mediana das <em>linhas</em>, não das pessoas.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="armadilha">
+      <h2>A armadilha principal: universo restrito</h2>
+
+      <p>Muita variável do Censo só é perguntada a um subconjunto da população.
+      Usar “não nulo” como denominador produz então um número
+      <strong>plausível e errado</strong>, e nenhum erro é levantado. Isto já
+      derrubou dez indicadores neste projeto:</p>
+
+      <table class="tab">
+        <thead><tr><th>variável</th><th>o que dava</th><th>denominador certo</th></tr></thead>
+        <tbody>
+          <tr><td><code>P0600</code> migração (2022)</td><td>65,4% de migrantes</td><td>população de 5 anos ou mais</td></tr>
+          <tr><td><code>P1140</code> trabalho (2022)</td><td>100,0% trabalhando fora</td><td>total de ocupados</td></tr>
+          <tr><td><code>P0260</code> quilombola (2022)</td><td>7,8%, doze vezes o publicado</td><td>população total</td></tr>
+          <tr><td><code>v0220</code> internet (2010)</td><td>80,2% com internet</td><td><code>v0219</code>, domicílios permanentes</td></tr>
+          <tr><td><code>v0626</code> migração (2010)</td><td>1,5% de migrantes</td><td>comparação de código em <code>v6264</code></td></tr>
+          <tr><td><code>v3211</code> residência anterior (1991)</td><td>43,4% de migrantes</td><td><code>v0318 &lt; 5</code></td></tr>
+        </tbody>
+      </table>
+
+      <p>Duas variantes não são “não nulo”, mas dão no mesmo:</p>
+      <ul>
+        <li><strong>Contribuinte automático.</strong> <code>v0650</code> (2010) e
+        <code>v0450</code> (2000) não são perguntadas a quem tem carteira
+        assinada, porque essa pessoa contribui por definição. Contar só quem
+        respondeu dava 22,6% e 18,7% de contribuição previdenciária. O numerador
+        passou a incluir a posição na ocupação.</li>
+        <li><strong>O oposto.</strong> <code>v0324</code> (série que frequenta,
+        1991) <em>nunca</em> é nula: quem não estuda aparece com o grau em zero,
+        não em NULL. A frequência escolar saía 100,00%.</li>
+      </ul>
+
+      <p><strong>Valor sentinela</strong> é uma terceira forma, e a mais
+      traiçoeira porque não deixa rastro de cobertura. <code>v3561</code>
+      (rendimento, 1991) é preenchida para todos, mas o código de “sem
+      declaração” é um número no meio da escala: a média nacional saiu em 1,7
+      milhão de cruzeiros. O detalhe que custou anos de dado é que ele é
+      <strong>“todos os noves” na largura do campo daquela variável</strong>, e
+      a largura muda dentro do mesmo censo — 8 dígitos aqui, 10 no rendimento
+      domiciliar. Filtrar por uma largura só deixa o resto passar. Está contado
+      em <a href="#deflator">Rendimento em reais de 2026</a>.</p>
+
+      <p class="regra">Sentinela não se descobre olhando o máximo: se descobre
+      contando quantos registros caem em cada largura de all-nines. Um pico é
+      resposta; um valor solto é lixo de digitação.</p>
+
+      <p class="regra">Antes de escrever qualquer denominador, medir a cobertura.
+      Cobertura muito abaixo de 100% num indicador que deveria valer para todos é
+      o sinal — e cobertura de exatamente 100% num quesito que só faz sentido
+      para parte da população é o sinal contrário, do mesmo defeito.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="validacao">
+      <h2>Como se valida</h2>
+
+      <p>Nenhum dos erros acima levanta exceção. Todos produzem percentual
+      plausível. Só dois testes os pegam:</p>
+
+      <ol>
+        <li><strong>Bater o agregado nacional contra o publicado pelo IBGE.</strong>
+        A célula de salvamento da extração imprime faixas esperadas para dezenas
+        de indicadores e marca o que sai fora.</li>
+        <li><strong>Pôr o indicador lado a lado nos censos em que existe.</strong>
+        Com seis censos, a série é o teste mais barato, e pega o que a faixa de um
+        ano só deixa passar. Foi assim que a previdência de 2000 caiu (18,7% entre
+        54,5 e 60,5) e que a frequência escolar de 1980 caiu — 62,7% contra 62,2%
+        de 1970, quando a matrícula no 1º grau tinha ido de 16 para 22,6 milhões.</li>
+      </ol>
+
+      <p>Onde há duas fontes para o mesmo dado, elas são comparadas. Os 52
+      municípios de 1980 recuperados do SPSS só foram gravados depois de os
+      <strong>171 municípios de Goiás que existem nas duas fontes baterem com
+      diferença 0,000000</strong> em 40 indicadores. E as fórmulas em R não foram
+      copiadas à mão do SQL: são geradas dele, porque duas cópias da mesma conta
+      divergem na primeira correção e as duas continuam parecendo certas.</p>
+
+      <h3>Um erro que só a comparação entre indicadores pegou</h3>
+
+      <p>Em 1970, <strong>moradores por domicílio</strong> e <strong>tamanho médio
+      da família</strong> estavam trocados. O primeiro saía da variável
+      <code>v005</code> (“Total de pessoas”) do registro de domicílio e dava 4,96;
+      o segundo saía da contagem de pessoas por <code>id_domicilio</code> e dava
+      5,12. Os dois números são plausíveis, nenhum levanta exceção, e cada um
+      isolado passa em qualquer conferência contra o publicado.</p>
+
+      <p>O que denunciou foi pôr os dois lado a lado: a família não pode ser
+      <em>maior</em> que o domicílio que a contém. Juntando as duas tabelas do
+      censo pela chave <code>(município, domicílio)</code>, <code>v005</code>
+      revelou-se igual à contagem de moradores em <strong>95,04%</strong> dos
+      domicílios e menor em <strong>4,95%</strong> — exatamente a fração que tem
+      mais de uma família (1,053 em média). <strong><code>v005</code> conta a
+      família</strong>, e coincide com o domicílio nos 95% em que os dois são a
+      mesma coisa. Foi por isso que a troca sobreviveu tanto tempo.</p>
+
+      <p class="regra">A correção não usa <code>v005</code> para nenhum dos dois: a
+      tabela de pessoa tem <code>id_domicilio</code> <em>e</em>
+      <code>numero_familia</code>, então as duas unidades saem da mesma varredura
+      com agrupamentos diferentes. E o teste que fecha é de consistência interna,
+      não contra fonte externa — <strong>a razão entre os dois é o número de
+      famílias por domicílio</strong>, e ela deu 1,054 contra os 1,053 medidos por
+      caminho independente.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="geografia">
+      <h2>Geografia: cada censo na malha do seu ano</h2>
+
+      <p>Eram 3.952 municípios em 1970 e são 5.570 hoje. Mato Grosso do Sul é de
+      1977, Tocantins de 1988, e Rondônia, Roraima e Amapá eram territórios. Cada
+      censo é desenhado na malha do <em>seu</em> ano, e o contorno estadual troca
+      junto com o dado.</p>
+
+      <p>A extração grava o código moderno do município mesmo nos censos
+      antigos; a malha grava o da época. A ponte vai por nome, aceitando só
+      correspondência única dentro do ano — um palpite errado aqui pinta o
+      polígono errado e não levanta exceção. Um caso o nome não resolve, porque
+      ele próprio mudou: em 1970 o município do Rio de Janeiro era o
+      <strong>Estado da Guanabara</strong>, com código e nome próprios.</p>
+
+      <h3>Os buracos de 1970 e 1980</h3>
+
+      <p>A região que hoje é Tocantins e a que hoje é Mato Grosso do Sul ficavam
+      cinzas. A causa não é a ponte de código — onde há dado, os códigos batem
+      dos dois lados. É dado ausente: o arquivo traz essas pessoas
+      <strong>sem código de município</strong>, então elas entram no total do
+      estado da época e em polígono nenhum.</p>
+
+      <table class="tab">
+        <thead><tr><th>ano</th><th>malha sem dado</th><th>população órfã</th><th>situação</th></tr></thead>
+        <tbody>
+          <tr><td>1970</td><td>105 municípios</td><td>826 mil</td>
+              <td><strong>resolvido</strong> pelos códigos da época</td></tr>
+          <tr><td>1980</td><td>54 municípios</td><td>740 mil</td>
+              <td><strong>resolvido</strong> pelo microdado original</td></tr>
+        </tbody>
+      </table>
+
+      <p>Em 1970 há <em>duas</em> causas, e só a segunda é dado ausente. A
+      primeira é o dígito verificador. Campo Grande aparece no dado como
+      <code>5102702</code> e na malha como <code>5102705</code>: os seis
+      primeiros dígitos são os mesmos, o sétimo — que é só o verificador — não.
+      A ponte por nome não pega esses casos porque <code>5102702</code>, lido
+      pela divisão territorial de hoje, é <strong>Canarana</strong>, criada em
+      1979, que não pode ter dado de 1970. Quem confirma o pareamento é a
+      população: 140.233 pessoas, que é Campo Grande de 1970 no publicado. São
+      27 municípios do futuro Mato Grosso do Sul, entre eles Corumbá, Dourados e
+      Três Lagoas. Os seis primeiros dígitos identificam município por
+      construção, e não há uma colisão sequer nas malhas de 1970 a 2010 — ainda
+      assim a regra só aceita quando o prefixo é único dos dois lados e o
+      polígono está livre.</p>
+
+      <p>A segunda: os registros órfãos ainda carregam a geografia
+      <em>da época</em>: UF, microrregião e o código do município como ele era
+      então. Essa tripla identifica município um para um — zero ambiguidades nos
+      3.907 pares em que há código moderno para conferir. O que ela não traz é o
+      <em>nome</em>, e sem nome não há ponte para a malha.</p>
+
+      <p>A tradução veio de duas fontes e de uma regularidade. A Divisão
+      Territorial de 1970 do Centro-Oeste nomeia os 84 municípios de Mato Grosso
+      e resolve esse estado direto. Goiás não está naquela divisão, mas o código
+      do município é <strong>o posto alfabético dentro da microrregião</strong> —
+      e isso não é suposição: nos 84 municípios de Mato Grosso, onde há as duas
+      informações, o posto reproduz o código em todos. Os nomes de Goiás vêm de
+      1980, onde os municípios existem, e as microrregiões de 1970 e 1980 têm os
+      mesmos tamanhos (12, 7, 7, 15, 10 e 1).</p>
+
+      <p class="regra">O teste que autoriza o encaixe: duas dessas microrregiões
+      cruzam a futura divisa TO/GO, então parte dos seus municípios <em>tem</em>
+      código moderno e serve de gabarito. São 14 âncoras, e as 14 caem no posto
+      certo. Se uma saísse do lugar, o script pararia sem gravar nada. Com isso
+      73 dos 74 municípios órfãos voltaram ao mapa; o que sobra é um no Ceará,
+      para o qual não há divisão territorial de 1970 que o nomeie.</p>
+
+      <p>Em 1980 o microdado distribuído não tem como localizá-los: são 178.636 linhas
+      com <code>id_municipio</code> nulo e nenhuma outra coluna geográfica — nem
+      identificador de domicílio, então nem a transferência domicílio → pessoa
+      seria possível. O microdado <em>original</em> em SPSS tem: a variável
+      <code>v5</code> corresponde aos quatro primeiros dígitos do código do
+      município (o código sem o dígito verificador), e 223 de 223 municípios de
+      Goiás casam. Com isso os 52 municípios do futuro Tocantins voltaram ao
+      mapa, e a população de 1980 subiu de 118,3 para <strong>119,0 milhões</strong>,
+      contra 119,003 publicados.</p>
+
+      <p class="regra">Este defeito ficou invisível por muito tempo porque o
+      pipeline só contava <em>dado sem geometria</em>, nunca
+      <em>geometria sem dado</em> — e o defeito mora do segundo lado. Polígono sem
+      dado fica cinza exatamente como polígono com dado faltando. Hoje o relatório
+      sai nos dois sentidos a cada rodada.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="ap2000">
+      <h2>A malha de áreas de ponderação de 2000</h2>
+
+      <p>O Censo 2000 tem área de ponderação no microdado, mas
+      <strong>o <a href="https://ipeagit.github.io/geobr/" target="_blank" rel="noopener">geobr</a> só publica essa malha para 2010 e 2022</strong>. Ela foi
+      construída aqui, a partir da composição
+      <em>setor censitário → área de ponderação</em> que o IBGE distribui com os
+      arquivos auxiliares do censo: 215.811 setores em <strong>9.336 áreas</strong>,
+      cobrindo os mesmos 5.507 municípios que a extração produz.</p>
+
+      <h3>O problema: a malha de setores de 2000 é incompleta</h3>
+
+      <p>A malha de setores urbanos de 2000 do IBGE só existe para municípios com
+      mais de 25 mil habitantes — e, mesmo neles, é parcial. Isso foi verificado
+      na fonte, não na cópia: o arquivo que o próprio IBGE distribui para
+      <strong>Angra dos Reis</strong> tem <strong>41 polígonos</strong>, e o censo
+      de 2000 registra <strong>181 setores</strong> naquele município. Os códigos
+      estão no mesmo formato de 15 dígitos dos dois lados, então não é falha de
+      junção. Somando urbano e rural, faltam 22.431 dos 215.811 setores.</p>
+
+      <p>Procuramos alternativa e não há. O repositório consolidado que circula
+      no GitHub é a mesma coleção de arquivos do IBGE, e o CEM/USP só publica
+      áreas de ponderação de 2010. A discussão pública sobre isso está na
+      <a href="https://github.com/ipea/geobr/issues/152">issue 152 do geobr</a>,
+      aberta desde 2020: o mantenedor do pacote registra que “existem áreas de
+      ponderação para o censo 2000, mas não acho os shapes em lugar algum”, e
+      que “os setores censitários de 2000 têm vários problemas”. Em novembro de
+      2023 o IBGE estava fazendo testes internos, sem prazo. O método de
+      reconstrução sugerido lá — unir os setores pelos códigos das áreas e
+      dissolver — é o mesmo usado aqui; quem o aplicou trabalhou só na Região
+      Metropolitana de São Paulo, onde a cobertura urbana é a melhor do país, e
+      por isso a lacuna nacional não aparece naquele relato.</p>
+
+      <h3>Como a malha foi montada, em ordem de confiança</h3>
+
+      <table class="tab">
+        <thead><tr><th>origem</th><th>áreas</th><th>o que é</th></tr></thead>
+        <tbody>
+          <tr><td>município inteiro</td><td>5.023</td>
+              <td>5.023 dos 5.507 municípios têm uma área só, e nesses a área
+                  <em>é</em> o município. Vem da malha municipal de 2000, que é
+                  completa.</td></tr>
+          <tr><td>dissolução de setores</td><td>4.057</td>
+              <td>áreas cujos setores existem todos na malha.</td></tr>
+          <tr><td>subtração</td><td>167</td>
+              <td>município onde falta uma área só: ela é o que sobra depois de
+                  tirar as irmãs. Vale apenas quando falta <em>uma</em> — com
+                  duas, não há como saber qual pedaço é de qual.</td></tr>
+          <tr><td>dissolução parcial<br>+ preenchimento</td><td>89</td>
+              <td>áreas com cobertura incompleta (82% dos setores, em média).
+                  São dissolvidas do que existe, e o vazio que sobra no município
+                  é atribuído à área vizinha com maior fronteira compartilhada.</td></tr>
+          <tr><td><strong>total</strong></td><td><strong>9.336</strong></td>
+              <td><strong>todas as áreas de ponderação de 2000 têm polígono.</strong></td></tr>
+        </tbody>
+      </table>
+
+      <p class="regra"><strong>As 89 do último grupo são aproximação, e é honesto
+      dizer isso.</strong> O pedaço não coberto vai para uma área que fisicamente
+      encosta nele — não é interpolação arbitrária — mas a divisa interna entre
+      essas áreas não é a divisa oficial do IBGE. Elas estão em 38 municípios,
+      concentrados em Pernambuco, Bahia, Rio de Janeiro e São Paulo. O
+      preenchimento redistribui, nesses 38 municípios, <strong>1,0% da área
+      municipal em média</strong>. A alternativa era deixar 89 buracos no mapa,
+      indistinguíveis de dado faltando.</p>
+
+      <h3>Limpeza: 26.148 fiapos e 80.878 buracos</h3>
+
+      <p>Toda operação de diferença entre polígonos que não encostam
+      exatamente deixa lixo, e a malha de 2000 não encosta exatamente em lugar
+      nenhum. A subtração devolvia, junto com a área de verdade, um filete ao
+      longo de <em>cada</em> divisa interna das áreas irmãs: mediana de
+      <strong>75 pedaços soltos por área</strong>, máximo de 1.432. E dissolver
+      setores que não ladrilham deixa vazios <em>dentro</em> do polígono. No
+      mapa os dois viram o mesmo risquinho.</p>
+
+      <p>Um passo de limpeza apaga pedaço solto e tapa buraco quando ele é
+      <strong>ao mesmo tempo</strong> insignificante em proporção (menos de 1%
+      da parte maior) e minúsculo em termos absolutos (menos de 1 km²). As duas
+      condições juntas são necessárias: só a primeira apagaria ilha de verdade
+      numa área grande, só a segunda apagaria ilha pequena numa área pequena.
+      O resultado leva a mediana de pedaços por área de 75 para <strong>1</strong>,
+      e o máximo de 1.432 para 67 — a mesma ordem da malha oficial de 2010.</p>
+
+      <p>A malha é conferida antes de ser usada: a <strong>soma das áreas de
+      ponderação dividida pela área do município dá 1,000 na mediana</strong>,
+      com 30 de 5.508 municípios fora da faixa de 0,95 a 1,05. Nenhuma área sai
+      com geometria inválida ou vazia.</p>
+
+      <p>E o dado é conferido contra ela, que é um teste diferente: somar a
+      população das áreas de ponderação de um município tem de devolver o
+      município. Devolve em <strong>5.507 de 5.507</strong>, com razão 1,0000 do
+      mínimo ao máximo — 169,9 milhões dos dois lados. É o teste que pega junção
+      errada, porque um código casado com a área errada continua produzindo mapa
+      bonito. As 9.336 áreas casaram pelo código inteiro de 13 dígitos, sem
+      precisar do remendo que 2010 exige (lá o código do microdado diverge do da
+      malha em 464 áreas), o que era de esperar: a malha de 2000 foi construída
+      da composição do próprio IBGE, então os dois lados falam o mesmo código.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="deflator">
+      <h2>Rendimento em reais de 2026</h2>
+
+      <p>Os oito indicadores de rendimento saíam do mapa escritos
+      <strong>R$</strong> e nenhum deles estava em reais de hoje: cada censo
+      media dinheiro na moeda da sua época. O mapa de 1991 era o pior caso —
+      chegava a mostrar “R$&nbsp;3,28”, porque ali o número nem em moeda
+      estava.</p>
+
+      <p>Todos passaram a sair em <strong>reais de janeiro de 2026</strong>.</p>
+
+      <table class="tab">
+        <thead><tr><th>censo</th><th>unidade original</th><th>fator</th></tr></thead>
+        <tbody>
+          <tr><td>1980</td><td>cruzeiro de 1980</td><td>0,260827</td></tr>
+          <tr><td>1991</td><td>cruzeiro de setembro de 1991</td>
+              <td>0,022293</td></tr>
+          <tr><td>2000</td><td>real de 2000</td><td>4,591044</td></tr>
+          <tr><td>2010</td><td>real de 2010</td><td>2,365582</td></tr>
+          <tr><td>2022</td><td>real de 2022</td><td>1,146734</td></tr>
+        </tbody>
+      </table>
+
+      <p>A fonte é a nota técnica de Corseuil e Foguel, <em>Uma sugestão de
+      deflatores para rendas obtidas a partir de algumas pesquisas domiciliares
+      do IBGE</em> (IPEA/MTE, <em>Mercado de Trabalho</em> n.&nbsp;19, 2002),
+      cuja Tabela 3 dá deflator e conversor de moeda para os censos de 1960 a
+      2000, com janeiro de 2002 igual a 1. Ela para ali, e faltam 2010, 2022 e a
+      ponte até 2026 — mas o que ela é, por dentro, é o INPC do IBGE centrado no
+      dia 1 por média geométrica de meses consecutivos, e isso se reconstrói da
+      SIDRA.</p>
+
+      <p>A reconstrução bate com a Tabela 1 da nota em <strong>todos os meses
+      menos o próprio mês-base</strong>, onde difere por um fator constante de
+      1,005334: a nota é de 2002 e usou o INPC preliminar de janeiro daquele ano,
+      revisado depois. Constante, não crescente — a variação mês a mês é
+      idêntica. Por isso a cadeia fecha em <strong>dezembro de 2001</strong>,
+      onde as duas séries concordam, e não no mês-base da nota.</p>
+
+      <p>Os conversores de moeda foram conferidos por fora, contra o salário
+      mínimo nominal da época: maio de 1980 devolve <strong>Cr$&nbsp;4.149,60</strong>,
+      exatamente o valor que o pipeline de 1980 já deduz do microdado pelo teto
+      da classe 5 da <code>v681</code>, por um caminho inteiramente diferente. E
+      o salário mínimo deflacionado desenha a curva conhecida: R$&nbsp;1.069 em
+      1970, 1.082 em 1980, 693 em 2000, 1.206 em 2010, 1.390 em 2022.</p>
+
+      <h3>1991: uma variável condenada por engano</h3>
+
+      <p>Por muito tempo 1991 não teve renda em dinheiro aqui. A
+      <code>v3561</code> (rendimento total) dava média nacional de
+      <strong>1,7 milhão de cruzeiros</strong>, e foi descartada como valor
+      sentinela irrecuperável; no lugar dela entrou o <em>ponto médio</em> das
+      faixas de salário mínimo da <code>v3562</code>. Estava errado, e o erro
+      era nosso.</p>
+
+      <p>O sentinela do IBGE é sempre <strong>“todos os noves”</strong> — mas
+      com a <strong>largura do campo de cada variável</strong>, que muda dentro
+      do mesmo censo:</p>
+
+      <table class="tab">
+        <thead><tr><th>variável</th><th>sentinela</th><th>dígitos</th><th>frequência</th></tr></thead>
+        <tbody>
+          <tr><td><code>v2012</code> rendimento domiciliar</td><td>9999999999</td><td>10</td><td>2,68%</td></tr>
+          <tr><td><code>v3561</code> rendimento total da pessoa</td><td>99999999</td><td>8</td><td>0,99%</td></tr>
+          <tr><td><code>v0356</code> ocupação principal</td><td>9999999</td><td>7</td><td>1,76%</td></tr>
+        </tbody>
+      </table>
+
+      <p>Um filtro calibrado na largura do domicílio deixa passar o da pessoa.
+      Não era “código de ignorado no meio dos valores”: era o código de topo de
+      um campo mais estreito. E 0,0099&nbsp;×&nbsp;10⁸ dá justamente a ordem do
+      1,7 milhão que nos fez desistir da variável — a conta fecha.</p>
+
+      <p class="regra">O ponto médio da faixa <strong>superestimava a renda em
+      12,6%</strong>, porque dentro de cada faixa a distribuição é assimétrica à
+      direita e a faixa de topo é aberta. Isso não era invisível: a razão de
+      rendimento entre sexos saía <strong>0,663 em 1991, acima dos 0,661 de
+      2000</strong>, quebrando a única série do site que sobe de forma monótona
+      em cinco censos. Com o valor no lugar da faixa ela vai a 0,632 e a série
+      volta a ser 0,526 → 0,632 → 0,661 → 0,683 → 0,749.</p>
+
+      <p>Com a troca, 1991 deixou de precisar do salário mínimo para virar
+      dinheiro — <strong>a maior suposição da deflação desapareceu</strong> —
+      e ganhou sete indicadores que não existiam: rendimento domiciliar per
+      capita (média e mediana, da <code>v2012</code> sobre os moradores, com
+      97,4% de cobertura), rendimento do trabalho, rendimento de todas as
+      fontes, e “sem rendimento algum”, que só é separável de “não perguntado”
+      quando existe um zero declarado. A cobertura da <code>v3561</code> entre
+      os de 14 anos ou mais é de 98,96%, e o resultado se encaixa sozinho na
+      série: 40,8% em 1980, 36,8% em 1991, 36,4% em 2000, 27,8% em 2010, 24,8%
+      em 2022.</p>
+
+      <p>O que apareceu depois da correção é a <strong>recessão do início dos
+      anos 90</strong>, que a superestimação da faixa vinha disfarçando: 1991 é
+      agora um vale em todas as colunas de renda.</p>
+
+      <p class="regra">Deflacionar é operação de nível, não de forma: as razões
+      de rendimento por sexo e por cor não podem se mexer, porque numerador e
+      denominador levam o mesmo fator. São elas o teste de que só o nível mudou.
+      Em 1991 elas <em>melhoraram</em>: guardar renda como “2,15 salários
+      mínimos”, com duas casas, custava 0,2% de precisão que a divisão
+      amplificava. Medido contra o valor exato do formato longo, o erro médio da
+      razão em 1991 caiu de 0,0018 para 0,00025 — sete vezes menor.</p>
+
+      <p>Ficam de fora, de propósito: rendimento em <strong>salários
+      mínimos</strong> (já é relativo, e mede outra coisa — distância do piso
+      legal, que sobe quando o mínimo perde valor real) e <strong>domicílios de
+      baixa renda</strong> (percentual abaixo de meio mínimo do próprio censo).
+      1970 continua sem indicador monetário — mas não pelo motivo que este
+      texto dizia antes.</p>
+
+      <p><strong>1970, e a mesma lição outra vez.</strong> A
+      <code>v041</code> foi dada como inutilizável porque mediana, percentil 90
+      e percentil 99 são todos <strong>9999</strong>. São percentis
+      <em>incondicionais</em>, e a conclusão não se sustenta: cruzando com a
+      <code>v047</code> (ocupação na última semana) no microdado original do
+      Cesit, o 9999 está em <strong>99,0% de quem não foi perguntado</strong> e
+      em apenas <strong>14,4% dos ocupados</strong>. Ele não é “ignorado”, é
+      “não se aplica” — e restrita ao universo certo a variável descreve uma
+      renda plausível de 1970. Medir no universo errado fez uma variável boa
+      parecer perdida, que é a armadilha de universo restrito virada do
+      avesso.</p>
+
+      <p>Ela não entrou ainda porque a medição foi feita em um estado só, e
+      porque 1970 exige converter os arquivos SPSS do Cesit como foi feito com
+      1980. Fica registrado como dívida, não como impossibilidade.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="escala">
+      <h2>Escala de cor</h2>
+
+      <p>Os cortes não são quantis. Quantil dá rampa contínua sem corte legível, e
+      com distribuição assimétrica o mapa parece escala logarítmica. O
+      classificador olha primeiro se a variável é discreta, separa massa pontual
+      (o zero de “sem instrução”, por exemplo), e sobre o núcleo robusto escolhe
+      passos <strong>redondos</strong> — números que o leitor soma de cabeça.
+      Ponta rala vira classe aberta: “menos de X”, “X ou mais”.</p>
+
+      <p>A legenda mostra, ao lado de cada classe, <strong>quanta gente</strong>
+      cai nela — não quantas unidades. São coisas muito diferentes: metade dos
+      municípios do Brasil soma menos de 10% da população.</p>
+
+      <p>A escala pode ser calculada sobre a <strong>série inteira</strong>, e não
+      só sobre o ano visível. Sem isso a mesma cor quer dizer coisas diferentes em
+      1991 e em 2022, e a comparação visual entre mapas mente.</p>
+
+      <p><strong>Piso de amostra.</strong> Unidade com denominador pequeno demais
+      fica fora do conjunto de valores — não recebe cor e, principalmente, não
+      entra no cálculo dos cortes. Deixar entrar faria um punhado de unidades
+      ruidosas dominarem a rampa.</p>
+
+      <h3>Bordas, e por que o padrão é não ter</h3>
+
+      <p>Com 5.570 municípios no Brasil inteiro, a linha de divisa ocupa mais
+      pixel que o polígono e o mapa vira uma grade cinza: o que se lê é a malha,
+      não o dado. É o mesmo problema que no ggplot se resolve tirando a borda do
+      cinza fixo. Há três opções:</p>
+
+      <ul>
+        <li><strong>sem borda</strong> — o padrão. As feições encostam sem
+        costura e as manchas voltam a ser o que se vê.</li>
+        <li><strong>tom do preenchimento</strong> — cada unidade contornada por
+        uma versão mais escura <em>dela mesma</em>: a divisa volta sem a grade.
+        A primeira versão disto usava a cor exata do preenchimento e era
+        indistinguível de “sem borda” — uma borda da cor do próprio polígono é
+        invisível contra ele. Medido por diferença de pixel, as três opções
+        agora se separam: 12,3%, 19,4% e 18,8% da imagem, no Brasil inteiro.</li>
+        <li><strong>de contraste</strong> — a linha escura fixa, que só compensa
+        no zoom de município.</li>
+      </ul>
+
+      <p class="regra">O outro padrão de arranque é a escala <strong>comparável
+      entre censos</strong>. Comparar entre censos é a razão de existir deste
+      mapa; deixar o padrão em “deste censo” fazia a mesma cor querer dizer
+      coisas diferentes em 1991 e em 2022 até alguém descobrir o seletor.</p>
+
+      <h3>A fonte</h3>
+
+      <p>Todo o texto está em <a href="https://www.brailleinstitute.org/freefont/"
+      target="_blank" rel="noopener">Atkinson Hyperlegible</a>, do Braille
+      Institute of America, desenhada para baixa visão: as letras que costumam se
+      confundir — <code>I l 1</code>, <code>O 0</code>, <code>b d p q</code> —
+      recebem formas deliberadamente distintas. Os códigos de variável usam a
+      versão monoespaçada da mesma família, que é onde confundir <code>0</code>
+      com <code>O</code> num nome como <code>D0111</code> custa mais caro. É a
+      versão variável, e não a estática de dois pesos, porque o site usa pesos
+      intermediários que o navegador teria de falsificar engrossando o traço —
+      exatamente o que uma fonte de legibilidade não pode sofrer.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="recorte">
+      <h2>Recorte e figura</h2>
+
+      <p><strong>Shift+clique</strong> recorta uma unidade e desenha só as
+      subdivisões dela: no nível Estado acende os municípios daquele estado, e
+      um segundo shift+clique acende as áreas de ponderação do município — nos
+      censos que as têm, que são 2000 em diante. <kbd>Esc</kbd> sobe um nível de
+      cada vez. Trocar de censo <em>mantém</em> o recorte, que é justamente o
+      uso: a mesma unidade em vários anos. Quando a unidade não existe na malha
+      do censo pedido — município criado depois, ou área de ponderação num ano
+      que não tem — o recorte cai e o ano vale assim mesmo.</p>
+
+      <p class="regra">Isto era um <em>modo</em>, com tela própria: entrar
+      escondia a lista de indicadores, o painel de valores e metade do
+      cabeçalho, mesmo para quem só queria ver os municípios de um estado.
+      Recortar é navegação, não uma tela à parte — e ler um valor dentro do
+      recorte, que o modo impedia, é o que mais se quer fazer ali.</p>
+
+      <p>Com o recorte aplicado, dois controles a mais aparecem na barra do
+      mapa. <strong>Mostrar</strong> escolhe em que subdivisão desenhar, onde há
+      mais de uma. <strong>Cortes</strong> decide sobre quais unidades os cortes
+      de cor são calculados — as do recorte ou as do país inteiro — e é eixo
+      separado da <strong>Escala</strong>, que decide sobre quais censos. As
+      quatro combinações fazem sentido; a mais útil numa figura é recorte +
+      série, a mesma unidade ao longo dos censos com a escala apertada nela.</p>
+
+      <h3>Vários censos lado a lado</h3>
+
+      <p>O botão <strong>PNG</strong> não baixa direto: abre a montagem da
+      figura. Título e fonte aparecem sobre o mapa, editáveis no lugar, e um
+      painel flutuante traz o canto da legenda, o mapa de fundo e a lista de
+      censos. Marcando <strong>dois ou mais censos</strong>, a figura sai como
+      uma grade — um <code>facet_wrap</code>.</p>
+
+      <p>Duas coisas são iguais em todos os painéis, e é o que faz a grade valer
+      alguma coisa:</p>
+
+      <ul>
+        <li><strong>O enquadramento.</strong> Cada censo tem a extensão da sua
+        própria malha, e um município desmembrado depois muda de retângulo.
+        A grade usa a <em>união</em> dos retângulos dos censos escolhidos e
+        recorta todos os painéis no mesmo lugar em pixel. Deixar cada painel se
+        enquadrar sozinho faria a figura comparar recortes diferentes.</li>
+        <li><strong>Os cortes de cor</strong>, calculados sobre esses censos
+        <em>juntos</em>, quaisquer que sejam os controles da barra. Usar todos
+        os censos daria classes que nenhum painel alcança; usar só o da tela
+        quebraria a comparação, que é a razão de existir da grade.</li>
+      </ul>
+
+      <p>Censo em que a unidade não existe entra como painel vazio rotulado, e
+      não é pulado: buraco num facet é informação, e pular desalinharia a grade.
+      A barra de população da legenda é de <em>um</em> censo — o último painel —
+      e a legenda diz qual, porque essa é a única parte dela que não vale para
+      a figura inteira.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="piramide">
+      <h2>Pirâmide etária</h2>
+
+      <p>Dezenove faixas de cinco anos por sexo, em percentual da população da
+      unidade. Fica num arquivo separado dos indicadores, e não numa coluna deles,
+      porque o padrão de acesso é o oposto: o mapa precisa de <em>todas</em> as
+      unidades para um indicador, a pirâmide precisa de <em>uma</em> unidade no
+      clique.</p>
+
+      <p>Cada linha é o código mais 76 caracteres — dois em base64 por valor, em
+      passo de 0,05 ponto percentual. A concatenação quase não economiza espaço
+      (gzip já come as vírgulas); o que economiza é precisão, e aí o limite é do
+      dado: numa área de ponderação com ~1.600 amostrados, o erro padrão de uma
+      faixa de 5% é <strong>0,54 ponto</strong>. Guardar 0,005 seria gravar cem
+      vezes mais precisão do que a estimativa tem. O que a concatenação resolve é
+      outra coisa: a linha entra no cache sem conversão nenhuma e só é fatiada no
+      clique.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="quarentena">
+      <h2>O que está em quarentena</h2>
+
+      <p>Indicador que a extração produziu mas que não bateu com o publicado fica
+      <strong>fora do mapa</strong> até ser corrigido. O dado continua no arquivo;
+      só não é oferecido. A fórmula errada fica visível na página de fórmulas, com
+      a explicação do que se sabe.</p>
+
+      <ul>
+        <li><strong>Frequência escolar de 6 a 14 e de 15 a 17 anos, em 1980.</strong>
+        62,7% contra 62,2% em 1970 — praticamente igual, quando entre os dois
+        censos a matrícula no 1º grau foi de ~16 para ~22,6 milhões com a
+        população de 7 a 14 anos crescendo ~20%. 1970 usa uma pergunta direta de
+        sim ou não; 1980 deriva do grau que frequenta, e alguma coisa nessa
+        derivação perde cerca de nove pontos.</li>
+      </ul>
+
+      <p>Um indicador foi removido de vez, e não posto em quarentena:
+      <strong>alfabetização sobre “quem respondeu”</strong>. O denominador não é o
+      mesmo universo entre censos — em 2000 a variável vem preenchida até para
+      bebês, todos contados como não alfabetizados, e em 2010 ela é nula abaixo de
+      cinco anos. Isso sozinho produzia um salto de 76,2% para 89,5% que não
+      aconteceu. Alfabetização de 15 anos ou mais cobre os cinco censos e é
+      comparável.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="limites">
+      <h2>O que este mapa não é</h2>
+
+      <p>Desenhar cada censo na malha do seu ano é correto. Comparar “o mesmo
+      município” ao longo do tempo <strong>não é</strong>: eram 3.952 municípios
+      em 1970 contra 5.570 hoje, e os que já existiam mudaram de limite. Série
+      temporal municipal exige Áreas Mínimas Comparáveis, que é outro exercício e
+      não está feito. Enquanto não estiver, o produto é “cada censo no seu
+      recorte”, não “evolução do município X”.</p>
+
+      <p>As áreas de ponderação de 2010 e 2022 são <strong>incompatíveis entre
+      si</strong>: 11.016 contra 14.406 unidades, formatos de código diferentes,
+      zero códigos em comum. Cada uma serve de recorte fino isolado, não de série.</p>
+
+      <p>Rendimento em valor absoluto <em>passou</em> a se comparar entre
+      censos, e é a mudança mais recente aqui: os oito indicadores monetários
+      saem em reais de janeiro de 2026. O que continua não se comparando é o
+      universo de cada pergunta — quem “tem rendimento” em 1980 e em 2022 não é
+      definido do mesmo jeito. A série mostra tendência, não diferença de
+      décimo.</p>
+
+      <p>1970 não tem cor ou raça — a pergunta não foi feita naquele censo.</p>
+    </section>
+
+    <p class="rodape-nota">Esta página é escrita à mão e descreve decisões. A
+    página de <a href="./metodologia.html">fórmulas</a> é gerada do código que
+    roda: se a fórmula lá estiver errada, o número no mapa está errado do mesmo
+    jeito — é esse o ponto.</p>
+
+  </main>
+
+  <script type="module">
+    import { initTema } from './js/tema.js';
+    initTema();
+  </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Censos Demográficos do Brasil, 1970-2022</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Crect x='2.5' y='2.5' width='5' height='5' fill='%23440154'/%3E%3Crect x='8.5' y='2.5' width='5' height='5' fill='%2331688e'/%3E%3Crect x='2.5' y='8.5' width='5' height='5' fill='%2335b779'/%3E%3Crect x='8.5' y='8.5' width='5' height='5' fill='%23fde725'/%3E%3C/svg%3E">
+  <script>
+    // aplica o tema salvo antes do primeiro paint (evita piscar escuro->claro)
+    try {
+      const t = localStorage.getItem('tema');
+      if (t && t !== 'escuro') document.documentElement.dataset.theme = t;
+    } catch { /* modo privado */ }
+  </script>
+  <!-- o @font-face esta no style.css, entao o navegador so descobre a fonte
+       depois de baixar e ler a folha inteira. O preload adianta o subconjunto
+       latin, que e o que cobre o portugues, e tira o lampejo de texto na fonte
+       de sistema. 'crossorigin' e obrigatorio em fonte mesmo na mesma origem. -->
+  <link rel="preload" as="font" type="font/woff2"
+        href="./fonts/ahn-latin.woff2" crossorigin>
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- maplibre e pmtiles auto-hospedados: mesma origem (uma conexao so, sem
+       DNS/TLS extra) e sem depender do unpkg estar no ar -->
+  <link rel="stylesheet" href="./css/vendor/maplibre-gl.css" />
+  <script defer src="./js/vendor/maplibre-gl.js"></script>
+  <script defer src="./js/vendor/pmtiles.js"></script>
+  <!-- o basemap so e pedido a partir do z6; ainda assim, resolver o DNS cedo
+       tira ~100 ms do primeiro tile -->
+  <link rel="dns-prefetch" href="https://tiles.openfreemap.org">
+  <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+</head>
+<body>
+  <header id="app-header">
+    <h1>Censos Demográficos<span class="h1-sub">Brasil, 1970&ndash;2022</span></h1>
+    <div id="sel-ano" role="group" aria-label="Censo"></div>
+    <div id="sel-nivel" role="group" aria-label="Nível geográfico"></div>
+    <p id="hover-label">Passe o mouse para ver; clique para fixar</p>
+    <!-- Baixar dado e imagem sao acoes do MAPA INTEIRO, nao do indicador:
+         ficam na barra de cima, junto do que define o recorte, e nao na
+         lateral entre os controles de cor. -->
+    <div id="sel-baixar" role="group" aria-label="Baixar">
+      <button id="btn-csv" type="button"
+              title="Baixar os valores deste mapa em CSV">CSV</button>
+      <button id="btn-png" type="button"
+              title="Baixar a imagem do mapa com a legenda">PNG</button>
+    </div>
+    <a class="link-voltar" href="./metodologia-geral.html">metodologia →</a>
+    <button id="btn-tema" type="button" title="Mudar para tema claro"></button>
+  </header>
+
+  <!-- Ficha do indicador, no hover do 'i' de cada linha da lista. Fora do
+       #sidebar de proposito: a coluna tem overflow escondido, e o balao precisa
+       transbordar para cima do mapa. -->
+  <div id="ind-ficha" hidden></div>
+
+  <div id="app-layout">
+    <aside id="sidebar">
+      <div id="sb-content">
+        <h2>Indicador</h2>
+        <!-- Lista propria, nao um <select> nativo: cada indicador leva um selo
+             com os seis censos, e <option> so aceita texto. O selo diz de
+             relance em que anos aquele indicador existe, que e a pergunta que
+             o usuario faz o tempo todo. -->
+        <div id="sel-indicador" class="combo">
+          <button id="ind-botao" type="button" aria-haspopup="listbox"
+                  aria-expanded="false" aria-label="Escolher indicador"></button>
+          <div id="ind-lista" role="listbox" hidden>
+            <input id="ind-busca" type="search" placeholder="filtrar&hellip;"
+                   aria-label="Filtrar indicadores" autocomplete="off">
+            <div id="ind-opcoes"></div>
+          </div>
+        </div>
+        <!-- Descricao e avisos num bloco que ROLA. Sem isto a coluna inteira
+             se reorganizava a cada troca de ano: a descricao vai de 42 a 109 px
+             conforme o indicador, e o que estivesse abaixo pulava de lugar. -->
+        <div id="sb-texto">
+          <p id="ind-desc"></p>
+          <p id="ind-aviso" hidden></p>
+          <p id="ano-nota" hidden></p>
+        </div>
+
+      </div>
+    </aside>
+
+    <button id="sb-toggle" type="button" class="aba" aria-expanded="true"
+            title="Recolher o painel de indicadores"
+            aria-controls="sidebar">&lsaquo;</button>
+
+    <div id="map-panel">
+      <div id="carregando">Carregando o mapa...</div>
+
+      <!-- Modo gráfico: textos que entram na captura de tela. Editáveis no
+           lugar; sem borda nem realce, para não sujarem o print. -->
+      <div id="gr-titulo" class="gr-texto" contenteditable="true" spellcheck="false"></div>
+      <div id="gr-fonte"  class="gr-texto" contenteditable="true" spellcheck="false"></div>
+
+      <!-- Barra de controles do mapa. Fica visível SEMPRE, e não só no modo
+           gráfico: paleta e base da escala mudam a leitura do mapa tanto quanto
+           o indicador, e ficavam escondidas na barra lateral enquanto controles
+           de recorte, que valem só no modo gráfico, tinham barra própria.
+           "Mostrar" e "Cortes" só aparecem com um recorte, porque sem ele não
+           há filhos para escolher nem recorte sobre o qual calcular. -->
+      <div id="mapa-controles">
+        <!-- Trilha do recorte. E tambem o unico lugar onde o shift+clique e
+             anunciado: sem isso o atalho seria invisivel para quem nunca leu a
+             metodologia. -->
+        <span id="foco-chip" hidden>
+          <span id="foco-nome"></span>
+          <button id="foco-sair" type="button" aria-label="Sair do recorte"
+                  title="Sair do recorte (Esc)">&times;</button>
+        </span>
+        <span id="foco-dica"></span>
+        <label id="gr-filhos-linha" class="so-foco">Mostrar
+          <select id="gr-filhos"></select>
+        </label>
+        <!-- "Cortes", e não "Escala": ao lado dele fica a base da escala, e
+             dois rótulos "Escala" lado a lado não diriam qual é qual. Este
+             decide sobre QUAIS UNIDADES os cortes de cor são calculados; o
+             outro, sobre quais CENSOS. -->
+        <label class="so-foco"
+               title="Sobre quais unidades os cortes de cor são calculados">Cortes
+          <select id="gr-escala">
+            <option value="local" selected>do recorte</option>
+            <option value="nacional">nacional</option>
+          </select>
+        </label>
+        <label title="Paleta de cores do mapa">Cores
+          <select id="sel-paleta" aria-label="Paleta de cores"></select>
+        </label>
+        <label title="Sobre quais censos os cortes de cor são calculados">Escala
+          <select id="sel-base" aria-label="Base da escala de cor"></select>
+        </label>
+        <!-- Malha densa: com 5.570 municípios no Brasil inteiro a linha de
+             divisa ocupa mais pixel que o polígono e o mapa vira uma grade
+             cinza. É o mesmo problema que no ggplot se resolve tirando a borda
+             do cinza fixo e ligando-a ao preenchimento.
+
+             "tom" contorna cada unidade com uma versão mais escura DELA MESMA:
+             a divisa continua legível e a grade some. A primeira versão usava a
+             cor exata do preenchimento e ficava indistinguível de "sem borda" —
+             uma borda da cor do próprio polígono é invisível contra ele. -->
+        <label title="Com malha densa, a linha de divisa domina a imagem">Bordas
+          <select id="sel-borda" aria-label="Cor das bordas">
+            <option value="contraste">de contraste</option>
+            <option value="tom">tom do preenchimento</option>
+            <option value="nenhuma" selected>sem borda</option>
+          </select>
+        </label>
+        <p id="base-nota" hidden></p>
+      </div>
+
+      <button id="btn-limpo" type="button" title="Modo limpo (só o Brasil, para print)">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3"/>
+          <rect x="7.5" y="8" width="9" height="8" rx="1.5"/>
+        </svg>
+      </button>
+      <div id="choro-legend"></div>
+
+      <!-- Montagem da figura. Titulo e fonte sao editados SOBRE o mapa, no
+           lugar; aqui fica o que nao cabe la: canto da legenda, mapa de fundo,
+           e quais censos entram. Dois ou mais censos marcados viram uma grade,
+           todos no mesmo enquadramento e na mesma escala de cor. -->
+      <div id="fig-panel" hidden>
+        <div id="fig-cabeca">
+          <span>Figura</span>
+          <button id="fig-cancelar" type="button" title="Cancelar (Esc)"
+                  aria-label="Cancelar">&times;</button>
+        </div>
+        <div id="fig-corpo">
+          <label>Legenda
+            <select id="fig-canto"></select>
+          </label>
+          <label class="fig-caixa">
+            <input id="fig-limpo" type="checkbox"> sem mapa de fundo
+          </label>
+          <div class="fig-secao">Censos na figura</div>
+          <div id="fig-anos"></div>
+          <p class="fig-nota">Dois ou mais viram uma grade, no mesmo
+             enquadramento e com os cortes de cor calculados sobre esses
+             censos juntos.</p>
+          <button id="fig-salvar" type="button">salvar PNG</button>
+        </div>
+      </div>
+
+      <!-- Piramide num painel flutuante, arrastavel como a legenda. Ela e a
+           unica coisa do painel lateral que se le COMPARANDO com o mapa: presa
+           na coluna da direita, obrigava a tirar os olhos do mapa e voltar. -->
+      <div id="pir-panel" hidden>
+        <div id="pir-cabeca">
+          <span id="pir-titulo"></span>
+          <button id="pir-fechar" type="button" title="Fechar" aria-label="Fechar">&times;</button>
+        </div>
+        <div id="pir-box"></div>
+      </div>
+    </div>
+
+    <button id="rp-toggle" type="button" class="aba" aria-expanded="true"
+            title="Recolher o painel de valores"
+            aria-controls="right-panel">&rsaquo;</button>
+
+    <div id="right-panel">
+      <div id="ap-header">
+        <div id="ap-title">Nenhuma área de ponderação selecionada</div>
+      </div>
+      <div id="placeholder-panel">
+        <p id="placeholder-acao">Clique em uma unidade no mapa para ver os indicadores.</p>
+        <p class="nota">Cada censo é desenhado na malha do seu próprio ano: eram
+           3.952 municípios em 1970 contra 5.570 em 2022. O mapa mostra o país
+           como ele era em cada data, não a trajetória de um município.</p>
+      </div>
+      <div id="ap-dados"></div>
+      <footer id="app-footer"></footer>
+    </div>
+  </div>
+
+  <script src="./js/main.js" type="module"></script>
+</body>
+</html>
