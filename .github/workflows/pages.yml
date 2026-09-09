@@ -1,5 +1,18 @@
 name: Deploy site to GitHub Pages
 
+# Publica o conteudo de site/ na RAIZ do Pages, para o mapa abrir em
+# /censos/ e nao em /censos/site/.
+#
+# Isto exige que a fonte do Pages esteja em "GitHub Actions", e nao em
+# "Deploy from a branch". Com deploy por branch o GitHub serve a raiz do
+# repositorio como esta, e o index.html fica um nivel abaixo.
+#
+# A primeira versao deste arquivo trazia 'enablement: true' no configure-pages,
+# na esperanca de ligar o Pages sozinho. Nao liga: o GITHUB_TOKEN nao tem
+# permissao de administracao do repositorio, e o passo falhava antes de chegar
+# ao upload. Ligar o Pages e escolher a fonte e uma acao de quem tem acesso as
+# configuracoes.
+
 on:
   push:
     branches: [main]
@@ -23,8 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

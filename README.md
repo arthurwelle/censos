@@ -6,6 +6,11 @@ Site estático (MapLibre GL + PMTiles), publicado no GitHub Pages.
 
 **[Abrir o mapa →](https://arthurwelle.github.io/censos/)**
 
+> O deploy é feito pelo Actions, que publica o conteúdo de `site/` na raiz do
+> Pages. Para isso a fonte precisa estar em **Settings → Pages → Source:
+> GitHub Actions**. Com "Deploy from a branch" o GitHub serve a raiz do
+> repositório como ela está, e o mapa cai em `/censos/site/`.
+
 ## O que tem aqui
 
 Este repositório publica **o site, e só ele**: os dados já agregados, as malhas
