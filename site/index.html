@@ -111,6 +111,28 @@
       <div id="gr-titulo" class="gr-texto" contenteditable="true" spellcheck="false"></div>
       <div id="gr-fonte"  class="gr-texto" contenteditable="true" spellcheck="false"></div>
 
+      <!-- Nota metodologica. O mesmo rotulo nao e a mesma pergunta em cada
+           censo -- "recebe aposentadoria" e situacao de emprego declarada em
+           1970 e existencia de rendimento de aposentadoria, pensao, Bolsa
+           Familia, BPC ou aluguel em 2022 -- e a figura viaja sozinha, longe
+           da pagina de metodologia. A caixa nasce preenchida com o que cada
+           censo considerou, arrasta pela alca, muda de largura pelo canto e e
+           editavel: quem monta a figura decide o que sobra dela. -->
+      <div id="gr-nota" hidden>
+        <div id="gr-nota-alca">
+          <span>nota metodológica</span>
+          <span class="gr-nota-btns">
+            <button id="gr-nota-refazer" type="button"
+                    title="Refazer o texto automático"
+                    aria-label="Refazer o texto automático">&#8635;</button>
+            <button id="gr-nota-fechar" type="button"
+                    title="Tirar a nota da figura"
+                    aria-label="Tirar a nota da figura">&times;</button>
+          </span>
+        </div>
+        <div id="gr-nota-texto" contenteditable="true" spellcheck="false"></div>
+      </div>
+
       <!-- Barra de controles do mapa. Fica visível SEMPRE, e não só no modo
            gráfico: paleta e base da escala mudam a leitura do mapa tanto quanto
            o indicador, e ficavam escondidas na barra lateral enquanto controles
@@ -191,6 +213,9 @@
           </label>
           <label class="fig-caixa">
             <input id="fig-limpo" type="checkbox"> sem mapa de fundo
+          </label>
+          <label class="fig-caixa">
+            <input id="fig-nota" type="checkbox" checked> nota metodológica
           </label>
           <div class="fig-secao">Censos na figura</div>
           <div id="fig-anos"></div>

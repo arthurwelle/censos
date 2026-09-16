@@ -15,6 +15,7 @@ import { map, updateChoropleth, initInteracao, initModoLimpo, setCamada,
          montarCanvas, baixarCanvas, comporGrade,
          bboxDaUnidade, unirBbox, enquadrarParaCaptura,
          capturarRecorte, BBOX_CONTINENTAL } from './map.js';
+import { carregarMetodologia, notaDosCensos } from './nota.js';
 import { initTema } from './tema.js';
 
 let indAtivo = INDICADORES.find((i) => i.default) ?? INDICADORES[0];
@@ -544,6 +545,7 @@ function baixarCsv() {
 let editandoFigura = false;
 let cantoLegenda = 'ie';
 let comLegenda = true;
+let comNota = true;
 let anosDoFacet = null;      // não-nulo só durante a captura, para forçar a escala
 
 function initFigura() {
@@ -563,6 +565,30 @@ function initFigura() {
 
   document.getElementById('fig-limpo').onchange = (ev) =>
     setModoLimpo(ev.target.checked);
+
+  const ligaNota = document.getElementById('fig-nota');
+  ligaNota.onchange = (ev) => {
+    comNota = ev.target.checked;
+    document.getElementById('gr-nota').hidden = !comNota;
+    if (comNota) preencherNota();
+  };
+  // O X da caixa e a caixinha do painel sao a MESMA chave: dois controles que
+  // discordam sobre se a nota entra na figura seria pior do que nao ter o X.
+  document.getElementById('gr-nota-fechar').onclick = () => {
+    ligaNota.checked = false;
+    ligaNota.onchange({ target: ligaNota });
+  };
+  // Desfaz a edicao e volta ao texto que sai da extracao. Sem isto, quem
+  // apagou uma linha sem querer so recuperava fechando e reabrindo a figura.
+  document.getElementById('gr-nota-refazer').onclick = () => {
+    delete document.getElementById('gr-nota-texto').dataset.editado;
+    preencherNota();
+  };
+  document.getElementById('gr-nota-texto').addEventListener('input', (ev) => {
+    ev.target.dataset.editado = '1';
+  });
+  tornarArrastavel(document.getElementById('gr-nota'),
+                   { pega: '#gr-nota-alca', quando: () => editandoFigura });
 
   document.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape' && editandoFigura) fecharFigura();
@@ -588,8 +614,13 @@ function abrirFigura() {
   document.body.classList.add('editando-figura');
   posicionarTitulo();
   document.getElementById('fig-limpo').checked = modoLimpoLigado();
+  document.getElementById('fig-nota').checked = comNota;
+  document.getElementById('gr-nota').hidden = !comNota;
   preencherTextos();
   montarAnosDaFigura();
+  // 330 KB de metodologia so para quem vai montar figura, e so uma vez. A
+  // nota aparece quando chegar; nada mais espera por ela.
+  carregarMetodologia().then(() => { if (editandoFigura) preencherNota(); });
   document.getElementById('fig-panel').hidden = false;
   document.getElementById('btn-png').classList.add('ativo');
   document.getElementById('btn-png').title = 'Salvar a figura em PNG';
@@ -604,7 +635,7 @@ function fecharFigura() {
 
   // os textos guardam o que foi digitado; sem limpar, a próxima figura de
   // outro indicador abriria com o título da anterior
-  for (const id of ['gr-titulo', 'gr-fonte']) {
+  for (const id of ['gr-titulo', 'gr-fonte', 'gr-nota-texto']) {
     const el = document.getElementById(id);
     el.textContent = '';
     delete el.dataset.editado;
@@ -647,8 +678,9 @@ async function montarAnosDaFigura() {
         a === ano() ? ' checked' : ''}> ${a}
     </label>`).join('');
   // trocar a seleção muda o que o título e a fonte podem afirmar
-  box.onchange = () => preencherTextos();
+  box.onchange = () => { preencherTextos(); preencherNota(); };
   preencherTextos();
+  preencherNota();
 }
 
 const anosMarcados = () =>
@@ -659,12 +691,13 @@ async function salvarFigura() {
   const btn = document.getElementById('fig-salvar');
   const titulo = document.getElementById('gr-titulo').textContent.trim();
   const creditos = document.getElementById('gr-fonte').textContent.trim();
+  const nota = textoDaNota();
   const anos = anosMarcados();
   btn.disabled = true;
   try {
     const canvas = anos.length > 1
-      ? await montarFacet(anos, { titulo, creditos })
-      : await montarCanvas({ titulo, creditos, comLegenda, cantoLegenda });
+      ? await montarFacet(anos, { titulo, creditos, nota })
+      : await montarCanvas({ titulo, creditos, nota, comLegenda, cantoLegenda });
     await baixarCanvas(canvas, nomeArquivo('png'));
     fecharFigura();
   } catch (e) {
@@ -679,7 +712,7 @@ async function salvarFigura() {
 // Vários censos lado a lado, na mesma escala e no mesmo enquadramento. Não são
 // vários mapas: é o mapa fotografado uma vez por censo, com a barra de anos
 // andando sozinha. Volta ao censo de origem no fim, dê certo ou não.
-async function montarFacet(anos, { titulo, creditos }) {
+async function montarFacet(anos, { titulo, creditos, nota }) {
   const anoOrigem = ano();
   const f = focoAtual();
   const cod = f?.cod ?? null;
@@ -717,7 +750,7 @@ async function montarFacet(anos, { titulo, creditos }) {
       recorte ??= r;          // o primeiro define o corte; os demais repetem
       paineis.push({ ano: a, canvas: capturarRecorte(recorte) });
     }
-    return comporGrade(paineis, { titulo, creditos, comLegenda });
+    return comporGrade(paineis, { titulo, creditos, nota, comLegenda });
   } finally {
     anosDoFacet = null;
     if (ano() !== anoOrigem) await irParaAno(anoOrigem);
@@ -959,6 +992,31 @@ function preencherTextos() {
   }
 }
 
+// A nota diz o que CADA CENSO da figura considerou, e nao o que o indicador
+// quer dizer em geral: a definicao de "recebe aposentadoria, pensao ou
+// beneficio" em 1970 e a situacao de emprego declarada como aposentado, por
+// familia; em 2022 e a existencia de rendimento de aposentadoria, pensao,
+// Bolsa Familia, BPC ou aluguel, por pessoa de 14 anos ou mais. A serie
+// continua valendo -- o que nao pode e a figura sair sem dizer isso.
+//
+// O texto e refeito a cada troca de indicador ou de censo, ate alguem editar.
+// Dai em diante manda o que foi escrito: o botao de refazer e o caminho de
+// volta.
+function preencherNota() {
+  const el = document.getElementById('gr-nota-texto');
+  if (!el || el.dataset.editado) return;
+  const anos = editandoFigura ? anosMarcados() : [];
+  el.textContent = notaDosCensos(indAtivo, anos.length ? anos : [ano()]);
+}
+
+// innerText, e nao textContent: o contenteditable guarda as quebras de linha
+// como <div> e <br>, e textContent traria a nota inteira numa linha so.
+function textoDaNota() {
+  const el = document.getElementById('gr-nota-texto');
+  if (!comNota || !el || document.getElementById('gr-nota').hidden) return '';
+  return (el.innerText ?? '').replace(/\u00a0/g, ' ').trimEnd();
+}
+
 // A fonte que o mapa está desenhando, já com o recorte aplicado. O CSV usa a MESMA função, senão o arquivo baixado não bate com a
 // figura que está na tela.
 //
@@ -996,6 +1054,11 @@ async function aplicarIndicador() {
   document.getElementById('ind-desc').innerHTML = indAtivo.desc;
   // ponto único por onde passa toda troca de ano, nível ou indicador
   marcarAnosSemIndicador();
+
+  // Trocar de indicador com a figura aberta trocava o mapa e deixava o título
+  // e a nota falando do indicador anterior — e a nota é justamente a parte que
+  // não dá para conferir de relance.
+  if (editandoFigura) { preencherTextos(); preencherNota(); }
 
   // lacuna de cobertura do censo, quando existe: a mancha cinza precisa de
   // explicação, senão parece bug do mapa

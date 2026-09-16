@@ -693,6 +693,74 @@ body.editando-figura .gr-texto:focus {
   border-radius: 4px;
 }
 
+/* ------------------------------------------------ nota metodológica */
+/* Aparece só ao montar a figura, como o título e a fonte. A largura é do
+   usuário (resize horizontal): é ela que decide a quebra do texto, na tela e
+   no PNG, então arrastar o canto é diagramar a nota. A altura não: ela vem do
+   texto, e travá-la esconderia linha sem avisar. */
+#gr-nota { display: none; }
+/* o :not([hidden]) nao e decorativo: sem ele esta regra ganha do display:none
+   que o atributo hidden traz, e o X da alca fecharia a nota so no papel */
+body.editando-figura #gr-nota:not([hidden]) {
+  display: block;
+  position: absolute;
+  /* Canto oposto ao da legenda, que mora embaixo à esquerda: nascer em cima
+     dela obrigava a arrastar antes de conseguir ler qualquer uma das duas. */
+  right: 12px;
+  bottom: 46px;
+  z-index: 4;
+  width: 340px;
+  min-width: 170px;
+  max-width: 92%;
+  background: var(--overlay);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;      /* sem isto o resize não vale */
+  resize: horizontal;
+}
+#gr-nota-alca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 4px 3px 9px;
+  border-bottom: 1px solid var(--border);
+  cursor: move;
+  user-select: none;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+/* A alça NÃO entra no PNG: ela é o controle, não a figura. O que é exportado é
+   a caixa do texto, na posição e na largura em que ela está na tela. */
+.gr-nota-btns { display: flex; gap: 2px; }
+.gr-nota-btns button {
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  padding: 1px 4px;
+  cursor: pointer;
+}
+.gr-nota-btns button:hover { color: var(--text); }
+#gr-nota-texto {
+  padding: 8px 9px 9px;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--text-2);
+  white-space: pre-wrap;
+  outline: none;
+  cursor: text;
+}
+/* Sem realce na primeira linha, de propósito: um contenteditable de texto puro
+   não tem como marcar "a linha lógica 1" em CSS (::first-line pega a primeira
+   linha VISUAL, e negritaria meio cabeçalho quando ele quebra). Uniforme na
+   tela e uniforme no PNG vale mais do que um negrito que só às vezes acerta. */
+#gr-nota-texto:focus { background: var(--surface-2); }
+
 /* A legenda entra na figura, então reaparece mesmo com o mapa de fundo
    desligado. E arrasta SEMPRE — ela tapa o canto inferior esquerdo, que é onde
    ficam o Acre, Rondônia e boa parte do Sul dependendo do enquadramento.

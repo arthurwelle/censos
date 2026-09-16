@@ -817,7 +817,8 @@ const arred = (ctx, x, y, w, h, r) => {
 // com regras de posicao diferentes: sobre um mapa so, num canto escolhido, e
 // embaixo de uma grade de censos, centrada. Quem posiciona precisa do tamanho
 // antes de decidir onde cabe.
-function medirLegenda(ctx, k, { semBarras = false } = {}) {
+function medirLegenda(ctx, k, { semBarras = false,
+                                rotuloBarra = 'barra: % da população' } = {}) {
   const e = ultimo;
   if (!e) return null;
   const F = (n) => `${n * k}px ${PILHA_FONTE}`;
@@ -843,18 +844,30 @@ function medirLegenda(ctx, k, { semBarras = false } = {}) {
 
   const pad = 10 * k, sw = 13 * k, gap = 7 * k, barra = 76 * k, pctW = 34 * k;
   const lh = 17 * k;
+
+  // O titulo e o rotulo da barra tambem sao desenhados dentro da caixa, e a
+  // largura so olhava para a coluna dos valores: indicador de nome comprido
+  // ("Recebe aposentadoria, pensao ou beneficio") sangrava para fora da
+  // legenda na figura exportada. Cada um mede na SUA fonte -- o titulo em 11,5
+  // negrito, o rodape em 9,5 --, senao a conta e de outro texto.
+  ctx.font = `600 ${F(11.5)}`;
+  const larguraLabel = ctx.measureText(e.label).width;
+  ctx.font = F(9.5);
+  const larguraRodape = ctx.measureText(rotuloBarra).width;
+
   // sem barra a caixa encolhe de verdade: a largura era mais da metade barra
   // e percentual, e manter o espaco vazio deixaria a legenda boiando
+  const colunas = sw + gap + larguraTxt
+                  + (semBarras ? 0 : gap + barra + gap + pctW);
   return {
     label: e.label, linhas, larguraTxt, pad, sw, gap, barra, pctW, lh, F,
-    semBarras,
-    w: pad * 2 + sw + gap + larguraTxt
-       + (semBarras ? 0 : gap + barra + gap + pctW),
+    semBarras, rotuloBarra,
+    w: pad * 2 + Math.max(colunas, larguraLabel, larguraRodape),
     h: pad * 2 + 17 * k + linhas.length * lh + 13 * k,
   };
 }
 
-function pintarLegenda(ctx, k, m, x, y, rotuloBarra = 'barra: % da população') {
+function pintarLegenda(ctx, k, m, x, y) {
   const { linhas, larguraTxt, pad, sw, gap, barra, pctW, lh, F } = m;
 
   ctx.fillStyle = themeVar('--overlay', 'rgba(22,27,34,0.94)');
@@ -900,7 +913,7 @@ function pintarLegenda(ctx, k, m, x, y, rotuloBarra = 'barra: % da população')
 
   ctx.fillStyle = themeVar('--muted', '#7d8791');
   ctx.font = F(9.5);
-  ctx.fillText(rotuloBarra, x + pad, cy + 2 * k);
+  ctx.fillText(m.rotuloBarra, x + pad, cy + 2 * k);
 }
 
 // Canto da legenda sobre um mapa. 'i'/'s' = inferior/superior, 'e'/'d' =
@@ -996,8 +1009,8 @@ function recortarPor(k, bb) {
 
 const retanguloContinental = (k) => recortarPor(k, BBOX_CONTINENTAL);
 
-// Retangulo em pixel do canvas, ja com a legenda dentro e uma folga.
-async function recorteDaFigura(comLegenda) {
+// Retangulo em pixel do canvas, ja com a legenda e a nota dentro, e uma folga.
+async function recorteDaFigura(comLegenda, caixaNota) {
   const cv = map.getCanvas();
   const k = escalaCanvas();
   const r = recorteDesenhado();
@@ -1026,12 +1039,13 @@ async function recorteDaFigura(comLegenda) {
     }
   }
 
-  if (comLegenda) {
-    const l = caixaDaLegenda(k);
-    if (l) {
-      x1 = Math.min(x1, l.x); y1 = Math.min(y1, l.y);
-      x2 = Math.max(x2, l.x + l.w); y2 = Math.max(y2, l.y + l.h);
-    }
+  // Legenda e nota entram na conta pelo mesmo motivo: sao parte da figura, e
+  // cortar o mapa rente ao dado deixaria as duas de fora.
+  const caixas = [comLegenda ? caixaDaLegenda(k) : null, caixaNota];
+  for (const c of caixas) {
+    if (!c) continue;
+    x1 = Math.min(x1, c.x); y1 = Math.min(y1, c.y);
+    x2 = Math.max(x2, c.x + c.w); y2 = Math.max(y2, c.y + c.h);
   }
 
   const folga = 12 * k;
@@ -1056,6 +1070,73 @@ function caixaDaLegenda(k) {
   return { x: (r.left - p.left) * k, y: (r.top - p.top) * k,
            w: r.width * k, h: r.height * k };
 }
+
+// ------------------------------------------------------- nota metodologica
+// A nota e a unica parte da figura cujo TAMANHO quem monta escolhe: a largura
+// da caixa na tela e a largura da caixa no PNG, e e ela que decide a quebra.
+// Por isso a medida recebe a largura de fora, em vez de calcula-la a partir do
+// texto como a legenda faz.
+//
+// A alca de arrastar nao entra: ela e controle, e nao figura. O que e copiado
+// e o retangulo do TEXTO -- posicao, largura e recheio.
+const NOTA_CORPO = 10;        // igual ao #gr-nota-texto do CSS
+const NOTA_LINHA = 1.45;
+const NOTA_PAD = 9;
+
+function medirNota(ctx, k, texto, larguraPx) {
+  const brutas = String(texto ?? '').replace(/\r/g, '').split('\n');
+  const pad = NOTA_PAD * k;
+  const lh = NOTA_CORPO * NOTA_LINHA * k;
+  const util = Math.max(40 * k, larguraPx - pad * 2);
+  ctx.font = `${NOTA_CORPO * k}px ${PILHA_FONTE}`;
+
+  const linhas = [];
+  for (const bruta of brutas) {
+    // linha continuada da anterior (a nota do indicador vem indentada): o
+    // recuo e o que separa o aviso da linha do censo a que ele pertence
+    const recuo = /^\s\s/.test(bruta) ? 9 * k : 0;
+    const t = bruta.trim();
+    if (!t) { linhas.push({ txt: '', recuo }); continue; }
+    for (const q of quebrarLinhas(ctx, t, util - recuo)) linhas.push({ txt: q, recuo });
+  }
+  while (linhas.length && !linhas.at(-1).txt) linhas.pop();
+  if (!linhas.length) return null;
+
+  return { linhas, pad, lh, w: larguraPx, h: pad * 2 + linhas.length * lh };
+}
+
+function pintarNota(ctx, k, m, x, y) {
+  ctx.fillStyle = themeVar('--overlay', 'rgba(22,27,34,0.94)');
+  arred(ctx, x, y, m.w, m.h, 8 * k);
+  ctx.fill();
+  ctx.strokeStyle = themeVar('--border', 'rgba(255,255,255,0.1)');
+  ctx.lineWidth = k;
+  ctx.stroke();
+
+  ctx.textBaseline = 'top';
+  ctx.font = `${NOTA_CORPO * k}px ${PILHA_FONTE}`;
+  ctx.fillStyle = themeVar('--text-2', '#aab4bf');
+  let cy = y + m.pad;
+  for (const l of m.linhas) {
+    if (l.txt) ctx.fillText(l.txt, x + m.pad + l.recuo, cy);
+    cy += m.lh;
+  }
+}
+
+// Onde a caixa do TEXTO da nota esta na tela, em pixel do canvas. Devolve null
+// quando a nota esta desligada -- e ai a figura sai sem ela.
+export function caixaDaNota(k) {
+  const el = document.getElementById('gr-nota');
+  const txt = document.getElementById('gr-nota-texto');
+  const painel = document.getElementById('map-panel');
+  if (!el || !txt || !painel || el.hidden) return null;
+  const r = txt.getBoundingClientRect();
+  const p = painel.getBoundingClientRect();
+  if (!(r.width > 0)) return null;
+  return { x: (r.left - p.left) * k, y: (r.top - p.top) * k, w: r.width * k };
+}
+
+const ctxDeMedida = () => document.createElement('canvas').getContext('2d');
 
 // Quebra o texto em linhas que caibam em 'larg'. A fonte JA TEM de estar
 // aplicada no ctx: quem mede tem de medir com o corpo com que vai desenhar.
@@ -1168,14 +1249,21 @@ export function esperarTilesDaCamada(teto = 20000) {
 // measureText sai errada junto.
 const esperarFonte = () => document.fonts?.ready ?? Promise.resolve();
 
-export async function montarCanvas({ titulo = '', creditos = '',
+export async function montarCanvas({ titulo = '', creditos = '', nota = '',
                                      comLegenda = true, cantoLegenda = 'ie' } = {}) {
   await esperarFonte();
   await esperarQuieto();
 
   const src = map.getCanvas();
   const k = escalaCanvas();
-  const rec = await recorteDaFigura(comLegenda);
+
+  // A nota e medida ANTES do recorte: e a altura medida aqui, e nao a do
+  // elemento na tela, que decide onde a figura tem de terminar. As duas quase
+  // sempre batem; quando divergem, quem manda e a que vai ser desenhada.
+  const cn = nota ? caixaDaNota(k) : null;
+  const mn = cn ? medirNota(ctxDeMedida(), k, nota, cn.w) : null;
+  const rec = await recorteDaFigura(
+    comLegenda, mn && { x: cn.x, y: cn.y, w: mn.w, h: mn.h });
 
   const out = document.createElement('canvas');
   out.width = rec.w;
@@ -1198,6 +1286,11 @@ export async function montarCanvas({ titulo = '', creditos = '',
     } else {
       desenharLegenda(ctx, k, out.width, out.height, cantoLegenda);
     }
+  }
+  if (mn) {
+    pintarNota(ctx, k, mn,
+      Math.min(Math.max(0, cn.x - rec.x), out.width - mn.w),
+      Math.min(Math.max(0, cn.y - rec.y), out.height - mn.h));
   }
   desenharTexto(ctx, k, out.width, out.height, titulo, creditos);
   return out;
@@ -1292,7 +1385,7 @@ export function capturarRecorte(r) {
 // mapas com o mesmo detalhe e so aumenta o que e texto.
 const TEXTO_GRADE = 3;
 
-export function comporGrade(paineis, { titulo = '', creditos = '',
+export function comporGrade(paineis, { titulo = '', creditos = '', nota = '',
                                        comLegenda = true, colunas = 0 } = {}) {
   const k = escalaCanvas();
   const kt = k * TEXTO_GRADE;   // escala do texto e da legenda
@@ -1307,10 +1400,23 @@ export function comporGrade(paineis, { titulo = '', creditos = '',
   // mede a legenda antes de dimensionar: ela fica numa faixa abaixo da grade,
   // centrada, e pode ser mais larga que a grade em figura de uma coluna só
   const medida = document.createElement('canvas').getContext('2d');
-  const mleg = comLegenda ? medirLegenda(medida, kt, { semBarras: true }) : null;
+  const mleg = comLegenda
+    ? medirLegenda(medida, kt, { semBarras: true,
+                                 rotuloBarra: `mesma escala nos ${paineis.length} painéis` })
+    : null;
 
   const gradeW = cols * pw + (cols - 1) * vao;
   const larguraFinal = Math.round(Math.max(gradeW, mleg?.w ?? 0) + mar * 2);
+
+  // A nota entra numa faixa abaixo da legenda, e nao onde ela esta na tela: a
+  // grade e uma composicao nova, e a posicao arrastada sobre UM mapa nao tem
+  // para onde ser traduzida numa figura de quatro. O que atravessa e a
+  // LARGURA escolhida -- vezes TEXTO_GRADE, porque aqui o texto cresce junto
+  // com o resto --, para a nota quebrar na grade como quebrava na tela.
+  const larguraNota = nota
+    ? Math.min(larguraFinal - mar * 2, (caixaDaNota(k)?.w ?? 340 * k) * TEXTO_GRADE)
+    : 0;
+  const mnota = larguraNota ? medirNota(medida, kt, nota, larguraNota) : null;
 
   // Quebrar ANTES de dimensionar: a altura das faixas de titulo e de fonte
   // depende de quantas linhas cada texto vai ocupar, e a altura do canvas
@@ -1325,12 +1431,13 @@ export function comporGrade(paineis, { titulo = '', creditos = '',
 
   const alturaTitulo = linhasTitulo.length ? linhasTitulo.length * lhTitulo + 14 * kt : 0;
   const alturaLegenda = mleg ? mleg.h + 14 * k : 0;
+  const alturaNota = mnota ? mnota.h + 12 * k : 0;
   const alturaFonte = linhasFonte.length ? linhasFonte.length * lhFonte + 12 * kt : 0;
 
   const out = document.createElement('canvas');
   out.width = larguraFinal;
   out.height = Math.round(rows * ph + (rows - 1) * vao + alturaTitulo
-                          + alturaLegenda + alturaFonte + mar * 2);
+                          + alturaLegenda + alturaNota + alturaFonte + mar * 2);
   const ctx = out.getContext('2d');
   ctx.fillStyle = themeVar('--bg-page', '#0f1216');
   ctx.fillRect(0, 0, out.width, out.height);
@@ -1373,8 +1480,12 @@ export function comporGrade(paineis, { titulo = '', creditos = '',
     // oferecia a leitura errada — barra de um ano encostada em mapa de
     // quatro. O que fica é a afirmação que vale para a figura toda.
     pintarLegenda(ctx, kt, mleg, (out.width - mleg.w) / 2,
-                  y0 + rows * ph + (rows - 1) * vao + 14 * k,
-                  `mesma escala nos ${paineis.length} painéis`);
+                  y0 + rows * ph + (rows - 1) * vao + 14 * k);
+  }
+
+  if (mnota) {
+    pintarNota(ctx, kt, mnota, (out.width - mnota.w) / 2,
+               y0 + rows * ph + (rows - 1) * vao + alturaLegenda + 12 * k);
   }
 
   const bloco = (linhas, y0, lh, cor, tam, peso) => {
