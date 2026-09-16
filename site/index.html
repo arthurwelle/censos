@@ -4,6 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Censos Demográficos do Brasil, 1970-2022</title>
+  <meta name="description" content="Mapas dos seis Censos Demográficos, de 1970 a 2022, na mesma escala de cores: 95 indicadores por estado, município e área de ponderação, dos microdados da amostra do IBGE.">
+
+  <!-- Cartão social. A imagem é saída literal da ferramenta — o mesmo PNG que
+       qualquer visitante gera clicando: um indicador, dois censos, a mesma
+       escala. og:image PRECISA de URL absoluta; caminho relativo é ignorado
+       pelos rastejadores, que não têm a página como base. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://arthurwelle.github.io/censos/">
+  <meta property="og:title" content="Censos Demográficos do Brasil, 1970-2022">
+  <meta property="og:description" content="Seis censos no mesmo mapa e na mesma escala de cores. 95 indicadores, até o nível de área de ponderação.">
+  <meta property="og:image" content="https://arthurwelle.github.io/censos/img/cartao.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Dois mapas do Brasil lado a lado, 1970 e 2022, coloridos pela proporção de domicílios com água canalizada até dentro: roxo em quase todo o país em 1970, verde e amarelo em 2022.">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Crect x='2.5' y='2.5' width='5' height='5' fill='%23440154'/%3E%3Crect x='8.5' y='2.5' width='5' height='5' fill='%2331688e'/%3E%3Crect x='2.5' y='8.5' width='5' height='5' fill='%2335b779'/%3E%3Crect x='8.5' y='8.5' width='5' height='5' fill='%23fde725'/%3E%3C/svg%3E">
   <script>
     // aplica o tema salvo antes do primeiro paint (evita piscar escuro->claro)
