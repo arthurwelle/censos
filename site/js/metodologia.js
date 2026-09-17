@@ -42,10 +42,29 @@ function cartao(ind, entrada) {
       ? `<div class="met-cods">${cods.map(([k, r]) =>
           `<span><code>${esc(k)}</code> ${esc(r)}</span>`).join('')}</div>`
       : '<div class="met-cods met-numerica">variável numérica, sem códigos</div>';
+    // Rótulo corrigido fica DITO, e não trocado em silêncio: quem confere a
+    // conta contra o dicionário do IBGE precisa saber que aqui ele diverge, e
+    // por quê. Foi um rótulo errado que deixou a alfabetização de 1970 em 0,1%.
+    const corr = g.correcao
+      ? `<div class="met-correcao">${esc(g.correcao)}</div>` : '';
     return `<div class="met-gloss">
-        <div class="met-gloss-cab"><code>${esc(v)}</code> ${esc(g.desc)}</div>
-        ${lista}</div>`;
+        <div class="met-gloss-cab"><code>${esc(v)}</code> ${esc(g.desc)}${
+          g.correcao ? '<span class="met-flag met-flag-corr">rótulo corrigido</span>' : ''}</div>
+        ${corr}${lista}</div>`;
   }).join('');
+
+  // Apelidos de 1980. As fórmulas do microdado original passam por views do
+  // DuckDB, e sem a definição delas metade de 1980 era inconferível aqui.
+  const apel = Object.entries(ind.apelidos || {}).map(([nome, a]) =>
+    `<div class="met-apelido">
+       <code class="met-ap-nome">${esc(nome)}</code>
+       <span class="met-ap-def">${realce(a.expr)}</span>
+       <span class="met-ap-desc">${esc(a.desc)}</span>
+       ${a.nota ? `<span class="met-ap-nota">${esc(a.nota)}</span>` : ''}
+     </div>`).join('');
+  const blocoApel = apel
+    ? `<div class="met-apelidos"><div class="met-ap-cab">apelidos da fórmula</div>${apel}</div>`
+    : '';
 
   // Indicador que está no catálogo mas não foi extraído naquele censo (ou o
   // contrário) é exatamente o tipo de coisa que esta página existe para expor.
@@ -54,7 +73,8 @@ function cartao(ind, entrada) {
 
   return `<article class="met-card" data-busca="${esc(
       (ind.col + ' ' + rot + ' ' + ind.num + ' ' + ind.den + ' ' +
-       ind.vars.join(' ')).toLowerCase())}">
+       ind.vars.join(' ') + ' ' +
+       Object.keys(ind.apelidos || {}).join(' ')).toLowerCase())}">
     <div class="met-cab">
       <code class="met-col">${esc(ind.col)}</code>
       <span class="met-rot">${esc(rot)}</span>
@@ -69,6 +89,7 @@ function cartao(ind, entrada) {
     </div>
     <dl class="met-formula">${linhas.map(([k, v]) =>
       `<dt>${k}</dt><dd>${realce(v)}</dd>`).join('')}</dl>
+    ${blocoApel}
     ${ind.nota ? `<p class="met-nota">${esc(ind.nota)}</p>` : ''}
     ${gloss}
   </article>`;

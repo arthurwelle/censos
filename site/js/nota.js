@@ -124,7 +124,7 @@ const limpar = (d) => String(d ?? '')
 const listar = (a) => (a.length < 2 ? a[0] ?? ''
   : `${a.slice(0, -1).join(', ')} ou ${a.at(-1)}`);
 
-function condicao(resto, cods) {
+function condicao(resto, cods, gloss = {}) {
   const rot = (c) => cods[String(c).trim().replace(/'/g, '')];
   let m;
   if (/^IS\s+NOT\s+NULL$/i.test(resto)) return ' declarado';
@@ -146,10 +146,22 @@ function condicao(resto, cods) {
     if (!resto.startsWith(op)) continue;
     const val = resto.slice(op.length).trim();
     const r = rot(val);
-    if (r) return op === '=' ? `: ${r}` : ` ${simb} ${r}`;
+    // O rótulo entra onde ele nomeia um valor que ESTÁ no conjunto: na
+    // igualdade e nos limites inclusivos. Em > e < ele nomeia justamente o que
+    // ficou de fora, e "grau que frequenta > Nenhum" lê ao contrário — ali o
+    // número informa mais.
+    if (r) {
+      if (op === '=') return `: ${r}`;
+      if (op === '<>' || op === '!=') return `: diferente de ${r}`;
+      if (op === '>=' || op === '<=') return ` ${simb} ${r}`;
+    }
     return ` ${simb} ${val}`;
   }
-  return resto ? ` ${resto}` : '';
+  if (!resto) return '';
+  // aritmética colada na variável ("/moradores/sm") não leva espaço: o espaço
+  // sugeriria uma nova cláusula
+  const t = trocarSobras(resto, gloss);
+  return /^[/*+-]/.test(resto) ? t : ` ${t}`;
 }
 
 // A variável é reconhecida pelo GLOSSÁRIO, e não por um padrão de nome: os
@@ -160,16 +172,24 @@ function frase(folha, gloss) {
   for (const v of chaves) {
     if (!folha.startsWith(v) || ehLetra(folha[v.length])) continue;
     let resto = folha.slice(v.length);
-    const par = resto.match(/^(\s+e\s+[A-Za-z]\w*)+/);   // "v026 e v027"
-    if (par) resto = resto.slice(par[0].length);
+    // 1970 escreve a idade como o par "v026 e v027". Quem nomeia o par é a
+    // ÚLTIMA: v026 é "tipo de idade" e v027 é a idade em si, e chamar a
+    // condição de "tipo de idade de 6 a 14" diz a coisa errada.
+    let alvo = v;
+    const par = resto.match(/^(\s+e\s+[A-Za-z]\w*)+/);
+    if (par) {
+      const ult = par[0].split(/\s+e\s+/).filter(Boolean).at(-1);
+      if (gloss[ult]) alvo = ult;
+      resto = resto.slice(par[0].length);
+    }
     // "v606 (exceto 999) >= 10": o parêntese diz o que foi descartado da
     // variável, e é parte do nome dela, não da comparação.
     const anota = resto.match(/^\s*(\([^)]*\))/);
     if (anota) resto = resto.slice(anota[0].length);
-    return limpar(gloss[v].desc) + (anota ? ` ${anota[1]}` : '')
-           + condicao(resto.trim(), gloss[v].codigos ?? {});
+    return limpar(gloss[alvo].desc) + (anota ? ` ${anota[1]}` : '')
+           + condicao(resto.trim(), gloss[alvo].codigos ?? {}, gloss);
   }
-  return folha;
+  return trocarSobras(folha, gloss);
 }
 
 function escrever(no, gloss, dentro = false) {
@@ -178,10 +198,13 @@ function escrever(no, gloss, dentro = false) {
   return dentro && no.lig === ' ou ' ? `(${t})` : t;
 }
 
-// Última passada: variável que sobrou crua dentro de aritmética ou de uma
-// função de agregação ("v0111 + v0112 > 0", "COUNTIF(v3072 < 15)") vira a
-// descrição dela. Não desfaz o que já foi escrito -- nenhuma descrição contém
-// um código de variável.
+// Variável que sobrou crua dentro de aritmética ou de uma função de agregação
+// ("v0111 + v0112 > 0", "renda/moradores/sm") vira a descrição dela.
+//
+// Só roda sobre TRECHO DE FÓRMULA, nunca sobre texto já traduzido. Rodando no
+// resultado final ela se mordia: o apelido 'grau' vira "grau da última série
+// concluída", que contém a palavra 'grau', que virava a descrição de novo --
+// "grau da última série concluída da última série concluída".
 function trocarSobras(txt, gloss) {
   let t = txt;
   for (const v of Object.keys(gloss).sort((a, b) => b.length - a.length)) {
@@ -200,8 +223,27 @@ function clausulas(f, gloss) {
   const filhos = raiz.lig === ' e ' ? raiz.filhos : [raiz];
   // Cláusula de OR entre outras precisa do parêntese: "idade ≥ 14 e A ou B"
   // lê-se de duas formas, e só uma delas é a fórmula.
-  return filhos.map((n) => trocarSobras(escrever(n, gloss, filhos.length > 1), gloss))
+  return filhos.map((n) => escrever(n, gloss, filhos.length > 1))
                .filter(Boolean);
+}
+
+// As fórmulas de 1980 falam em 'part', 'renda_ok', 'a25' — apelidos das views
+// do DuckDB que geraram a extração. Sem isto a nota saía com o apelido cru
+// dentro do PNG, que não significa nada para quem recebe a figura.
+//
+// O apelido entra como se fosse uma variável: descrição própria e, quando ele é
+// só um outro nome para UMA variável do IBGE, os códigos dela junto — é o que
+// faz 'grau = 3' virar "grau da última série concluída: Ginasial médio".
+// Apelido montado sobre duas ou mais variáveis não herda código nenhum: ali o
+// código não teria a que se referir.
+function comApelidos(e) {
+  const g = { ...(e.glossario ?? {}) };
+  for (const [nome, a] of Object.entries(e.apelidos ?? {})) {
+    const so = (a.vars ?? []).length === 1 ? e.glossario?.[a.vars[0]] : null;
+    g[nome] = { desc: a.desc, codigos: (so?.codigos && Object.keys(so.codigos).length)
+                                       ? so.codigos : {} };
+  }
+  return g;
 }
 
 const REGISTRO = { domicílio: 'por domicílio', pessoa: 'por pessoa',
@@ -220,7 +262,7 @@ export function notaDosCensos(ind, anos) {
     const e = (dados.anos[String(a)] ?? []).find((x) => x.col === ind.col);
     if (!e) { linhas.push(`${a} · sem fórmula registrada na extração.`); continue; }
 
-    const gloss = e.glossario ?? {};
+    const gloss = comApelidos(e);
     const num = clausulas(e.num, gloss);
     const base = clausulas(e.den, gloss).filter((c) => !num.includes(c));
     const partes = [String(a), REGISTRO[e.registro] ?? e.registro, num.join(' e ')]

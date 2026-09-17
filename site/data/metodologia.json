@@ -2371,10 +2371,11 @@
      "v035": {
       "desc": "Alfabetização",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Corrigido pela distribuição real (03_frequencias.ipynb): o código 0 tem 0,09% do peso e o dicionário o dá como \"Sim\". A escala publicada está deslocada em um."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2415,10 +2416,11 @@
      "v035": {
       "desc": "Alfabetização",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Corrigido pela distribuição real (03_frequencias.ipynb): o código 0 tem 0,09% do peso e o dicionário o dá como \"Sim\". A escala publicada está deslocada em um."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2458,10 +2460,11 @@
      "v035": {
       "desc": "Alfabetização",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Corrigido pela distribuição real (03_frequencias.ipynb): o código 0 tem 0,09% do peso e o dicionário o dá como \"Sim\". A escala publicada está deslocada em um."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2500,10 +2503,11 @@
      "v035": {
       "desc": "Alfabetização",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Corrigido pela distribuição real (03_frequencias.ipynb): o código 0 tem 0,09% do peso e o dicionário o dá como \"Sim\". A escala publicada está deslocada em um."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2526,10 +2530,11 @@
      "v035": {
       "desc": "Alfabetização",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Corrigido pela distribuição real (03_frequencias.ipynb): o código 0 tem 0,09% do peso e o dicionário o dá como \"Sim\". A escala publicada está deslocada em um."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2568,10 +2573,11 @@
      "v035": {
       "desc": "Alfabetização",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Corrigido pela distribuição real (03_frequencias.ipynb): o código 0 tem 0,09% do peso e o dicionário o dá como \"Sim\". A escala publicada está deslocada em um."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2610,10 +2616,11 @@
      "v036": {
       "desc": "Frequenta a escola",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Deduzido: mesma escala deslocada de v035, confirmada pelo valor publicado. Ainda não medido na distribuição real."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2636,10 +2643,11 @@
      "v036": {
       "desc": "Frequenta a escola",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Deduzido: mesma escala deslocada de v035, confirmada pelo valor publicado. Ainda não medido na distribuição real."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -2678,10 +2686,11 @@
      "v036": {
       "desc": "Frequenta a escola",
       "codigos": {
-       "0": "Sim",
-       "1": "Não",
-       "2": "Sem declaração"
-      }
+       "0": "Sem declaração",
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "Deduzido: mesma escala deslocada de v035, confirmada pelo valor publicado. Ainda não medido na distribuição real."
      },
      "v054": {
       "desc": "Peso da pessoa",
@@ -3297,6 +3306,40 @@
       "desc": "Cômodos servindo de dormitório",
       "codigos": {}
      }
+    },
+    "apelidos": {
+     "dorm": {
+      "expr": "ANY_VALUE(v213)",
+      "desc": "cômodos servindo de dormitório",
+      "vars": [
+       "v213"
+      ]
+     },
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
     }
    },
    {
@@ -3406,6 +3449,33 @@
        "7": "Coletivo improvisado"
       }
      }
+    },
+    "apelidos": {
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
     }
    },
    {
@@ -3433,6 +3503,34 @@
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "criancas": {
+      "expr": "COUNT(*) FILTER (WHERE v606 < 15)",
+      "desc": "moradores com menos de 15 anos",
+      "vars": [
+       "v606"
+      ]
+     },
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -3471,6 +3569,27 @@
        "9": "Parente do empregado doméstico"
       }
      }
+    },
+    "apelidos": {
+     "chefe_dom": {
+      "expr": "v503 = 1",
+      "desc": "chefe do domicílio",
+      "vars": [
+       "v503"
+      ]
+     },
+     "sexo": {
+      "expr": "v501",
+      "desc": "sexo",
+      "vars": [
+       "v501"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
     }
    },
    {
@@ -3504,6 +3623,27 @@
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "chefe_dom": {
+      "expr": "v503 = 1",
+      "desc": "chefe do domicílio",
+      "vars": [
+       "v503"
+      ]
+     },
+     "idade": {
+      "expr": "NULLIF(v606, 999)",
+      "desc": "idade em anos",
+      "vars": [
+       "v606"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -3549,7 +3689,27 @@
       "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     }
+    }
    },
    {
     "col": "a19b_rdpc_media",
@@ -3566,7 +3726,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -3602,9 +3763,60 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "a19c_rdpc_sm",
@@ -3662,6 +3874,61 @@
      "v681": {
       "desc": "Classe de renda total",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "sm": {
+      "expr": "teto da classe 5 da v681, por UF",
+      "desc": "salário mínimo de 1980",
+      "vars": [
+       "v681"
+      ],
+      "nota": "O salário mínimo de 1980 era regional: não há um valor nacional para dividir. A classe 5 da v681 é \"mais de 3/4 até 1 SM\", e o teto dela é um salário inteiro na moeda daquela UF."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -3721,6 +3988,61 @@
      "v681": {
       "desc": "Classe de renda total",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "sm": {
+      "expr": "teto da classe 5 da v681, por UF",
+      "desc": "salário mínimo de 1980",
+      "vars": [
+       "v681"
+      ],
+      "nota": "O salário mínimo de 1980 era regional: não há um valor nacional para dividir. A classe 5 da v681 é \"mais de 3/4 até 1 SM\", e o teto dela é um salário inteiro na moeda daquela UF."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -4207,21 +4529,44 @@
      "v524": {
       "desc": "Grau da última série concluída",
       "codigos": {
-       "0": "Nenhuma",
-       "1": "Primário",
-       "2": "Ginasial médio",
-       "3": "1º grau",
-       "4": "2º grau",
-       "5": "Colegial médio",
-       "6": "Supletivo 1º grau",
-       "7": "Supletivo 2º grau",
-       "8": "Superior",
+       "0": "Nenhum",
+       "1": "Alfabetização de adultos",
+       "2": "Primário",
+       "3": "Ginasial médio",
+       "4": "1º grau",
+       "5": "2º grau",
+       "6": "Colegial ou médio",
+       "7": "Superior",
+       "8": "Mestrado ou doutorado",
        "9": "Sem declaração"
-      }
+      },
+      "correcao": "Corrigido pelo \"Labels 1980.SPS\" do microdado original. O dicionário da extração repete aqui a escala da v521, que é outra pergunta."
      },
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "a25": {
+      "expr": "NULLIF(v606, 999) >= 25 AND v524 BETWEEN 0 AND 8",
+      "desc": "25 anos ou mais com instrução declarada",
+      "vars": [
+       "v524",
+       "v606"
+      ]
+     },
+     "grau": {
+      "expr": "NULLIF(v524, 9)",
+      "desc": "grau da última série concluída",
+      "vars": [
+       "v524"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -4549,21 +4894,51 @@
      "v524": {
       "desc": "Grau da última série concluída",
       "codigos": {
-       "0": "Nenhuma",
-       "1": "Primário",
-       "2": "Ginasial médio",
-       "3": "1º grau",
-       "4": "2º grau",
-       "5": "Colegial médio",
-       "6": "Supletivo 1º grau",
-       "7": "Supletivo 2º grau",
-       "8": "Superior",
+       "0": "Nenhum",
+       "1": "Alfabetização de adultos",
+       "2": "Primário",
+       "3": "Ginasial médio",
+       "4": "1º grau",
+       "5": "2º grau",
+       "6": "Colegial ou médio",
+       "7": "Superior",
+       "8": "Mestrado ou doutorado",
        "9": "Sem declaração"
-      }
+      },
+      "correcao": "Corrigido pelo \"Labels 1980.SPS\" do microdado original. O dicionário da extração repete aqui a escala da v521, que é outra pergunta."
      },
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "a25": {
+      "expr": "NULLIF(v606, 999) >= 25 AND v524 BETWEEN 0 AND 8",
+      "desc": "25 anos ou mais com instrução declarada",
+      "vars": [
+       "v524",
+       "v606"
+      ]
+     },
+     "grau": {
+      "expr": "NULLIF(v524, 9)",
+      "desc": "grau da última série concluída",
+      "vars": [
+       "v524"
+      ]
+     },
+     "serie": {
+      "expr": "NULLIF(v523, 9)",
+      "desc": "última série concluída",
+      "vars": [
+       "v523"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -4599,21 +4974,51 @@
      "v524": {
       "desc": "Grau da última série concluída",
       "codigos": {
-       "0": "Nenhuma",
-       "1": "Primário",
-       "2": "Ginasial médio",
-       "3": "1º grau",
-       "4": "2º grau",
-       "5": "Colegial médio",
-       "6": "Supletivo 1º grau",
-       "7": "Supletivo 2º grau",
-       "8": "Superior",
+       "0": "Nenhum",
+       "1": "Alfabetização de adultos",
+       "2": "Primário",
+       "3": "Ginasial médio",
+       "4": "1º grau",
+       "5": "2º grau",
+       "6": "Colegial ou médio",
+       "7": "Superior",
+       "8": "Mestrado ou doutorado",
        "9": "Sem declaração"
-      }
+      },
+      "correcao": "Corrigido pelo \"Labels 1980.SPS\" do microdado original. O dicionário da extração repete aqui a escala da v521, que é outra pergunta."
      },
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "a25": {
+      "expr": "NULLIF(v606, 999) >= 25 AND v524 BETWEEN 0 AND 8",
+      "desc": "25 anos ou mais com instrução declarada",
+      "vars": [
+       "v524",
+       "v606"
+      ]
+     },
+     "grau": {
+      "expr": "NULLIF(v524, 9)",
+      "desc": "grau da última série concluída",
+      "vars": [
+       "v524"
+      ]
+     },
+     "serie": {
+      "expr": "NULLIF(v523, 9)",
+      "desc": "última série concluída",
+      "vars": [
+       "v523"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -4626,6 +5031,7 @@
     "den": "CASE WHEN a25 THEN w ELSE 0 END",
     "vars": [
      "v524",
+     "v525",
      "v606"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
@@ -4633,21 +5039,49 @@
      "v524": {
       "desc": "Grau da última série concluída",
       "codigos": {
-       "0": "Nenhuma",
-       "1": "Primário",
-       "2": "Ginasial médio",
-       "3": "1º grau",
-       "4": "2º grau",
-       "5": "Colegial médio",
-       "6": "Supletivo 1º grau",
-       "7": "Supletivo 2º grau",
-       "8": "Superior",
+       "0": "Nenhum",
+       "1": "Alfabetização de adultos",
+       "2": "Primário",
+       "3": "Ginasial médio",
+       "4": "1º grau",
+       "5": "2º grau",
+       "6": "Colegial ou médio",
+       "7": "Superior",
+       "8": "Mestrado ou doutorado",
        "9": "Sem declaração"
-      }
+      },
+      "correcao": "Corrigido pelo \"Labels 1980.SPS\" do microdado original. O dicionário da extração repete aqui a escala da v521, que é outra pergunta."
      },
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     },
+     "v525": {
+      "desc": "Tipo do último curso concluído",
+      "codigos": {}
+     }
+    },
+    "apelidos": {
+     "a25": {
+      "expr": "NULLIF(v606, 999) >= 25 AND v524 BETWEEN 0 AND 8",
+      "desc": "25 anos ou mais com instrução declarada",
+      "vars": [
+       "v524",
+       "v606"
+      ]
+     },
+     "curso": {
+      "expr": "v525",
+      "desc": "tipo do último curso concluído",
+      "vars": [
+       "v525"
+      ],
+      "nota": "Os códigos 43 a 85 são cursos superiores e 86 em diante é pós-graduação."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -4716,7 +5150,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -4750,9 +5185,47 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "rend_tot": {
+      "expr": "v607 + v609 + v610 + v611 + v612 + v613, descartando 9999999",
+      "desc": "rendimento total",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "sexo": {
+      "expr": "v501",
+      "desc": "sexo",
+      "vars": [
+       "v501"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "c10b_rend_masc",
@@ -4768,7 +5241,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -4802,9 +5276,47 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "rend_tot": {
+      "expr": "v607 + v609 + v610 + v611 + v612 + v613, descartando 9999999",
+      "desc": "rendimento total",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "sexo": {
+      "expr": "v501",
+      "desc": "sexo",
+      "vars": [
+       "v501"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "c11_raz_rend_raca",
@@ -4874,7 +5386,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -4911,9 +5424,47 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "cor": {
+      "expr": "v509",
+      "desc": "cor",
+      "vars": [
+       "v509"
+      ]
+     },
+     "rend_tot": {
+      "expr": "v607 + v609 + v610 + v611 + v612 + v613, descartando 9999999",
+      "desc": "rendimento total",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "c11b_rend_brancos",
@@ -4929,7 +5480,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -4966,9 +5518,47 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "cor": {
+      "expr": "v509",
+      "desc": "cor",
+      "vars": [
+       "v509"
+      ]
+     },
+     "rend_tot": {
+      "expr": "v607 + v609 + v610 + v611 + v612 + v613, descartando 9999999",
+      "desc": "rendimento total",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "c13_beneficio",
@@ -5159,7 +5749,8 @@
     "den": "CASE WHEN renda_ok AND rend_trab > 0 THEN w ELSE 0 END",
     "vars": [
      "v607",
-     "v609"
+     "v609",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -5170,9 +5761,36 @@
      "v609": {
       "desc": "Renda em dinheiro bruto em outras ocupações",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "rend_trab": {
+      "expr": "v607 + v609, descartando 9999999",
+      "desc": "rendimento do trabalho",
+      "vars": [
+       "v607",
+       "v609"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "c8_rend_total_med",
@@ -5187,7 +5805,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -5214,9 +5833,40 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
      }
     },
-    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "rend_tot": {
+      "expr": "v607 + v609 + v610 + v611 + v612 + v613, descartando 9999999",
+      "desc": "rendimento total",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
    },
    {
     "col": "c9_sem_rendimento",
@@ -5232,7 +5882,8 @@
      "v610",
      "v611",
      "v612",
-     "v613"
+     "v613",
+     "v681"
     ],
     "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
     "glossario": {
@@ -5263,6 +5914,44 @@
      "v613": {
       "desc": "Rendimento recebido de outros rendimentos",
       "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
+     }
+    },
+    "apelidos": {
+     "idade": {
+      "expr": "NULLIF(v606, 999)",
+      "desc": "idade em anos",
+      "vars": [
+       "v606"
+      ]
+     },
+     "rend_tot": {
+      "expr": "v607 + v609 + v610 + v611 + v612 + v613, descartando 9999999",
+      "desc": "rendimento total",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -5393,6 +6082,15 @@
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "idade": {
+      "expr": "NULLIF(v606, 999)",
+      "desc": "idade em anos",
+      "vars": [
+       "v606"
+      ]
      }
     }
    },
@@ -5633,6 +6331,27 @@
        "5": "Individual"
       }
      }
+    },
+    "apelidos": {
+     "chefe_fam": {
+      "expr": "v504 = 1",
+      "desc": "chefe da família",
+      "vars": [
+       "v504"
+      ]
+     },
+     "em_familia": {
+      "expr": "v505 BETWEEN 0 AND 3",
+      "desc": "pessoa que compõe uma família",
+      "vars": [
+       "v505"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
     }
    },
    {
@@ -5670,6 +6389,27 @@
        "9": "Parente do empregado doméstico"
       }
      }
+    },
+    "apelidos": {
+     "chefe_fam": {
+      "expr": "v504 = 1",
+      "desc": "chefe da família",
+      "vars": [
+       "v504"
+      ]
+     },
+     "sexo": {
+      "expr": "v501",
+      "desc": "sexo",
+      "vars": [
+       "v501"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
     }
    },
    {
@@ -5703,6 +6443,27 @@
      "v606": {
       "desc": "Idade em anos",
       "codigos": {}
+     }
+    },
+    "apelidos": {
+     "chefe_fam": {
+      "expr": "v504 = 1",
+      "desc": "chefe da família",
+      "vars": [
+       "v504"
+      ]
+     },
+     "idade": {
+      "expr": "NULLIF(v606, 999)",
+      "desc": "idade em anos",
+      "vars": [
+       "v606"
+      ]
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
      }
     }
    },
@@ -11482,7 +12243,11 @@
      },
      "v0627": {
       "desc": "Sabe ler e escrever",
-      "codigos": {}
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "O dicionário não traz rótulo. Deduzido da distribuição real (89,5% / 10,5%, contra 90,4% de alfabetização em 2010)."
      }
     }
    },
@@ -11506,7 +12271,11 @@
      },
      "v0627": {
       "desc": "Sabe ler e escrever",
-      "codigos": {}
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "O dicionário não traz rótulo. Deduzido da distribuição real (89,5% / 10,5%, contra 90,4% de alfabetização em 2010)."
      },
      "v6036": {
       "desc": "Idade calculada em anos",
@@ -11533,7 +12302,11 @@
      },
      "v0627": {
       "desc": "Sabe ler e escrever",
-      "codigos": {}
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "O dicionário não traz rótulo. Deduzido da distribuição real (89,5% / 10,5%, contra 90,4% de alfabetização em 2010)."
      },
      "v6036": {
       "desc": "Idade calculada em anos",
@@ -11560,7 +12333,11 @@
      },
      "v0627": {
       "desc": "Sabe ler e escrever",
-      "codigos": {}
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "O dicionário não traz rótulo. Deduzido da distribuição real (89,5% / 10,5%, contra 90,4% de alfabetização em 2010)."
      },
      "v6036": {
       "desc": "Idade calculada em anos",
@@ -11586,7 +12363,11 @@
      },
      "v0627": {
       "desc": "Sabe ler e escrever",
-      "codigos": {}
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "O dicionário não traz rótulo. Deduzido da distribuição real (89,5% / 10,5%, contra 90,4% de alfabetização em 2010)."
      }
     }
    },
@@ -11604,7 +12385,11 @@
     "glossario": {
      "v0627": {
       "desc": "Sabe ler e escrever",
-      "codigos": {}
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      },
+      "correcao": "O dicionário não traz rótulo. Deduzido da distribuição real (89,5% / 10,5%, contra 90,4% de alfabetização em 2010)."
      },
      "v6036": {
       "desc": "Idade calculada em anos",

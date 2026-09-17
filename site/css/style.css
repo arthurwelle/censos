@@ -988,6 +988,59 @@ body.pagina-texto #app-header { position: sticky; top: 0; z-index: 10; }
   border-radius: 3px;
 }
 
+/* Apelidos das fórmulas de 1980. Ficam ENTRE a fórmula e o glossário porque é
+   nessa ordem que se lê: a fórmula fala em 'part', o apelido diz o que é, e o
+   glossário diz o que a variável do IBGE significa. */
+.met-apelidos {
+  margin-top: 9px;
+  padding: 7px 9px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.met-ap-cab {
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.met-apelido {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  padding: 3px 0;
+  border-top: 1px solid var(--border);
+}
+.met-apelido:first-of-type { border-top: 0; }
+.met-ap-nome {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #d29922;
+}
+.met-ap-def {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+.met-ap-desc { font-size: 11px; color: var(--muted); }
+.met-ap-nota { flex: 1 1 100%; font-size: 10.5px; color: var(--muted); line-height: 1.45; }
+
+/* Rótulo que diverge do dicionário do IBGE. Dito, e não trocado em silêncio:
+   quem confere a conta contra o dicionário precisa saber onde eles discordam. */
+.met-flag-corr { color: var(--accent); border-color: var(--accent); }
+.met-correcao {
+  margin-top: 3px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  border-left: 2px solid var(--accent);
+  padding-left: 7px;
+}
+
 /* ------------------------------------------- controles do painel lateral */
 .sb-linha {
   display: flex;
