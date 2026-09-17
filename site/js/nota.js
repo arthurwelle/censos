@@ -450,6 +450,62 @@ function comApelidos(e, reserva = {}) {
   return g;
 }
 
+// ------------------------------------------------------------------ médias
+// Numa média a condição diz QUEM entra, mas o que se mede é o VALOR que o peso
+// multiplica: 'IF(v0402 = 1, p001 * v4752, 0)' é a idade média dos
+// responsáveis. Ler só a condição, como nos percentuais, dava "relação com
+// responsável: Pessoa responsável" e escondia que a conta é sobre a idade.
+function condEValor(f) {
+  const s = String(f ?? '').trim();
+  let m;
+  if (/^IF\(/i.test(s) && s.endsWith(')')) {
+    const a = dividir(s.slice(3, -1), ',');
+    if (a.length === 3 && a[2] === '0') return { cond: a[0], valor: a[1] };
+  }
+  if ((m = s.match(/^CASE\s+WHEN\s+(.+?)\s+THEN\s+(.+?)\s+ELSE\s+0\s+END$/is))) {
+    return { cond: m[1], valor: m[2] };
+  }
+  if ((m = s.match(/^soma de\s+(\S+)\s+quando\s+(.+)$/i))) return { cond: m[2], valor: m[1] };
+  return { cond: '', valor: s };
+}
+
+function valorLegivel(v, gloss) {
+  const ctx = { gloss: { ...PSEUDO, ...gloss }, frag: [] };
+  let t = desembrulharParenteses(legivel(v, ctx));
+  if (!t) return '';
+  // o par "v026 e v027" de 1970 é nomeado pela segunda (ver frase())
+  t = t.replace(/\b(\w+)\s+e\s+(\w+)\b/g, (m, a, b) => (ctx.gloss[a] && ctx.gloss[b] ? b : m));
+  t = trocarSobras(t, ctx.gloss);
+  return soltar(t, ctx.frag)
+    .replace(/\s*\/\s*/g, ' / ')
+    .replace(/(\d)\.(\d)/g, '$1,$2');
+}
+
+function textoDaMedia(e, gloss) {
+  const pn = condEValor(e.num), pd = condEValor(e.den);
+  const valor = valorLegivel(pn.valor, gloss);
+  const quem = clausulas(pd.cond || pn.cond, gloss);
+  if (!valor) {
+    // só peso nos dois lados: é contagem sobre contagem, como pessoas em
+    // família por chefe de família
+    const a = clausulas(pn.cond, gloss).join(' e ');
+    const b = quem.join(' e ');
+    return a && b ? `${a}, por ${b}` : (a || b);
+  }
+  // "renda > 0" e "renda declarada" sobre a própria variável dizem só que
+  // zeros ou brancos ficaram de fora; vira um aposto curto
+  // A comparação ignora parênteses e espaços: a condição passa por clausulas()
+  // e o valor não, e "(a + b) > 0" é a mesma coisa que "a + b > 0".
+  let aposto = '';
+  const norm = (x) => x.replace(/[()\s]/g, '');
+  const resto = quem.filter((c) => {
+    if (norm(c) === norm(`${valor} declarado`)) return false;
+    if (norm(c) === norm(`${valor} > 0`)) { aposto = ' (só valores acima de zero)'; return false; }
+    return true;
+  });
+  return `média de ${valor}${aposto}` + (resto.length ? `, entre ${resto.join(' e ')}` : '');
+}
+
 const REGISTRO = { domicílio: 'por domicílio', pessoa: 'por pessoa',
                    família: 'por família' };
 
@@ -467,6 +523,12 @@ export function notaDosCensos(ind, anos) {
     if (!e) { linhas.push(`${a} · sem fórmula registrada na extração.`); continue; }
 
     const gloss = comApelidos(e, glossDoAno(a));
+    if (e.tipo === 'media') {
+      const partes = [String(a), REGISTRO[e.registro] ?? e.registro, textoDaMedia(e, gloss)];
+      linhas.push(`${partes.filter(Boolean).join(' · ')}.`);
+      if (e.nota) linhas.push(`  ${e.nota}`);
+      continue;
+    }
     const num = e.tipo === 'razao' && /— calculado em /.test(e.num)
       ? [e.num.replace(/\s*— calculado em [\s\S]*$/, '')]
       : clausulas(e.num, gloss);

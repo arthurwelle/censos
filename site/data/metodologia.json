@@ -7234,8 +7234,8 @@
     "tipo": "media",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0111 + v0112 > 0, peso_amostral * v0111 + v0112, 0)",
-    "den": "IF(v0111 + v0112 > 0, peso_amostral, 0)",
+    "num": "IF((v0111 + v0112) > 0, peso_amostral * (v0111 + v0112), 0)",
+    "den": "IF((v0111 + v0112) > 0, peso_amostral, 0)",
     "vars": [
      "v0111",
      "v0112"
@@ -7437,8 +7437,8 @@
     "tipo": "media",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral * IF(v2012 = 9999999999, NULL, v2012) / v0111 + v0112, 0)",
-    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral, 0)",
+    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0, peso_amostral * IF(v2012 = 9999999999, NULL, v2012) / (v0111 + v0112), 0)",
+    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0, peso_amostral, 0)",
     "vars": [
      "v0111",
      "v0112",
@@ -7465,8 +7465,8 @@
     "tipo": "media",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral * IF(v2012 = 9999999999, NULL, v2012) / v0111 + v0112 / 42000, 0)",
-    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral, 0)",
+    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0, peso_amostral * IF(v2012 = 9999999999, NULL, v2012) / (v0111 + v0112) / 42000, 0)",
+    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0, peso_amostral, 0)",
     "vars": [
      "v0111",
      "v0112",
@@ -7552,8 +7552,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0 AND IF(v2012 = 9999999999, NULL, v2012) / v0111 + v0112 / 42000 < 0.5, peso_amostral, 0)",
-    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral, 0)",
+    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0 AND IF(v2012 = 9999999999, NULL, v2012) / (v0111 + v0112) / 42000 < 0.5, peso_amostral, 0)",
+    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0, peso_amostral, 0)",
     "vars": [
      "v0111",
      "v0112",
@@ -7580,8 +7580,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0 AND IF(v2012 = 9999999999, NULL, v2012) / v0111 + v0112 < 31172.15, peso_amostral, 0)",
-    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral, 0)",
+    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0 AND IF(v2012 = 9999999999, NULL, v2012) / (v0111 + v0112) < 31172.15, peso_amostral, 0)",
+    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND (v0111 + v0112) > 0, peso_amostral, 0)",
     "vars": [
      "v0111",
      "v0112",
