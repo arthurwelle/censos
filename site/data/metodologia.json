@@ -1122,8 +1122,8 @@
     "tipo": "nao_agrega",
     "registro": "domicílio",
     "peso": "D0111",
-    "num": "soma de D0360 × D0111 dos 10% do topo",
-    "den": "soma de D0360 × D0111 dos 40% da base",
+    "num": "soma de D0360 dos 10% mais ricos",
+    "den": "soma de D0360 dos 40% mais pobres",
     "vars": [
      "D0360"
     ],
@@ -8690,8 +8690,8 @@
     "tipo": "nao_agrega",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "renda somada dos 10% do topo (soma acumulada de peso × valor)",
-    "den": "renda somada dos 40% da base",
+    "num": "renda domiciliar per capita somada dos 10% mais ricos",
+    "den": "renda domiciliar per capita somada dos 40% mais pobres",
     "vars": [
      "peso_amostral",
      "v0111",
@@ -11283,8 +11283,8 @@
     "tipo": "nao_agrega",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "renda somada dos 10% do topo (soma acumulada de peso × valor)",
-    "den": "renda somada dos 40% da base",
+    "num": "renda domiciliar per capita somada dos 10% mais ricos",
+    "den": "renda domiciliar per capita somada dos 40% mais pobres",
     "vars": [
      "p001",
      "peso_amostral",
@@ -13894,8 +13894,8 @@
     "tipo": "nao_agrega",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "renda somada dos 10% do topo (soma acumulada de peso × valor)",
-    "den": "renda somada dos 40% da base",
+    "num": "renda domiciliar per capita somada dos 10% mais ricos",
+    "den": "renda domiciliar per capita somada dos 40% mais pobres",
     "vars": [
      "peso_amostral",
      "v6036",
