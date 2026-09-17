@@ -1384,6 +1384,9 @@ export function capturarRecorte(r) {
 // corpo 16 vira um fio. Multiplicar aqui, e nao no k do painel, mantem os
 // mapas com o mesmo detalhe e so aumenta o que e texto.
 const TEXTO_GRADE = 3;
+// A nota e leitura de apoio, e ocupa a largura inteira da figura: corpo menor
+// que o do titulo e da legenda, para nao competir com os mapas.
+const TEXTO_NOTA = 2;
 
 export function comporGrade(paineis, { titulo = '', creditos = '', nota = '',
                                        comLegenda = true, colunas = 0 } = {}) {
@@ -1397,26 +1400,38 @@ export function comporGrade(paineis, { titulo = '', creditos = '', nota = '',
   const rows = Math.ceil(paineis.length / cols);
   const vao = 10 * k, mar = 14 * k;
 
-  // mede a legenda antes de dimensionar: ela fica numa faixa abaixo da grade,
-  // centrada, e pode ser mais larga que a grade em figura de uma coluna só
+  // Mede a legenda antes de dimensionar. Com numero impar de paineis sobra
+  // quadro vazio na ultima linha, e e ali que ela vai: a faixa de baixo so e
+  // usada quando a grade fecha certinho, ou quando a legenda nao cabe no vao
+  // nem encolhida ate 60%.
   const medida = document.createElement('canvas').getContext('2d');
-  const mleg = comLegenda
-    ? medirLegenda(medida, kt, { semBarras: true,
-                                 rotuloBarra: `mesma escala nos ${paineis.length} painéis` })
-    : null;
+  const n = paineis.length;
+  const medirLeg = (kk) => medirLegenda(medida, kk, { semBarras: true,
+    rotuloBarra: `mesma escala nos ${n} painéis` });
+  const vazios = cols * rows - n;
+  const vaoW = vazios * pw + Math.max(0, vazios - 1) * vao;
+  let kl = kt;
+  let mleg = comLegenda ? medirLeg(kl) : null;
+  let legNoVao = false;
+  if (mleg && vazios > 0) {
+    const folga = 2 * vao;
+    const s = Math.min(1, (vaoW - folga) / mleg.w, (ph - folga) / mleg.h);
+    if (s >= 0.6) {
+      const m2 = medirLeg(kt * s);
+      if (m2 && m2.w <= vaoW && m2.h <= ph) { kl = kt * s; mleg = m2; legNoVao = true; }
+    }
+  }
 
   const gradeW = cols * pw + (cols - 1) * vao;
-  const larguraFinal = Math.round(Math.max(gradeW, mleg?.w ?? 0) + mar * 2);
+  const larguraFinal = Math.round(
+    Math.max(gradeW, legNoVao ? 0 : (mleg?.w ?? 0)) + mar * 2);
 
-  // A nota entra numa faixa abaixo da legenda, e nao onde ela esta na tela: a
-  // grade e uma composicao nova, e a posicao arrastada sobre UM mapa nao tem
-  // para onde ser traduzida numa figura de quatro. O que atravessa e a
-  // LARGURA escolhida -- vezes TEXTO_GRADE, porque aqui o texto cresce junto
-  // com o resto --, para a nota quebrar na grade como quebrava na tela.
-  const larguraNota = nota
-    ? Math.min(larguraFinal - mar * 2, (caixaDaNota(k)?.w ?? 340 * k) * TEXTO_GRADE)
-    : 0;
-  const mnota = larguraNota ? medirNota(medida, kt, nota, larguraNota) : null;
+  // A nota vai numa faixa no pe da figura, de margem a margem, e nao onde ela
+  // esta na tela: a grade e uma composicao nova, e a posicao arrastada sobre UM
+  // mapa nao tem para onde ser traduzida numa figura de varios.
+  const kn = k * TEXTO_NOTA;
+  const larguraNota = nota ? larguraFinal - mar * 2 : 0;
+  const mnota = larguraNota ? medirNota(medida, kn, nota, larguraNota) : null;
 
   // Quebrar ANTES de dimensionar: a altura das faixas de titulo e de fonte
   // depende de quantas linhas cada texto vai ocupar, e a altura do canvas
@@ -1430,7 +1445,7 @@ export function comporGrade(paineis, { titulo = '', creditos = '', nota = '',
   const lhTitulo = 16 * 1.3 * kt, lhFonte = 10.5 * 1.4 * kt;
 
   const alturaTitulo = linhasTitulo.length ? linhasTitulo.length * lhTitulo + 14 * kt : 0;
-  const alturaLegenda = mleg ? mleg.h + 14 * k : 0;
+  const alturaLegenda = mleg && !legNoVao ? mleg.h + 14 * k : 0;
   const alturaNota = mnota ? mnota.h + 12 * k : 0;
   const alturaFonte = linhasFonte.length ? linhasFonte.length * lhFonte + 12 * kt : 0;
 
@@ -1473,7 +1488,12 @@ export function comporGrade(paineis, { titulo = '', creditos = '', nota = '',
     ctx.fillText(String(p.ano), x + 9 * kt, y + 7 * kt);
   });
 
-  if (mleg) {
+  if (mleg && legNoVao) {
+    // centrada no vao que sobrou a direita da ultima linha
+    const xv = x0 + (n % cols) * (pw + vao);
+    const yv = y0 + (rows - 1) * (ph + vao);
+    pintarLegenda(ctx, kl, mleg, xv + (vaoW - mleg.w) / 2, yv + (ph - mleg.h) / 2);
+  } else if (mleg) {
     // Sem a barra de população: as CORES valem para a grade inteira, porque o
     // domínio dos cortes é o mesmo em todos os painéis, mas a barra é a
     // distribuição de UM censo. Rotular qual era honesto e ainda assim
@@ -1484,7 +1504,7 @@ export function comporGrade(paineis, { titulo = '', creditos = '', nota = '',
   }
 
   if (mnota) {
-    pintarNota(ctx, kt, mnota, (out.width - mnota.w) / 2,
+    pintarNota(ctx, kn, mnota, mar,
                y0 + rows * ph + (rows - 1) * vao + alturaLegenda + 12 * k);
   }
 

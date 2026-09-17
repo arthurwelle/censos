@@ -285,7 +285,7 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "D0111",
-    "num": "D0360 < {SALARIO_MINIMO / 2}",
+    "num": "D0360 < 606",
     "den": "D0360 IS NOT NULL",
     "vars": [
      "D0360"
@@ -302,7 +302,7 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "D0111",
-    "num": "D0360 < {LINHA_REAL}",
+    "num": "D0360 < 606",
     "den": "D0360 IS NOT NULL",
     "vars": [
      "D0360"
