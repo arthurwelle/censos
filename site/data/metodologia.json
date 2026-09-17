@@ -243,6 +243,24 @@
     "nota": "A fórmula devolve reais de 2022. O valor no mapa é esse número multiplicado por 1,146734, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
    },
    {
+    "col": "a19d_rdpc_p10",
+    "tipo": "mediana",
+    "registro": "domicílio",
+    "peso": "D0111",
+    "num": "quantil ponderado 0.1 de D0360 (soma acumulada do peso até 0.1 (um décimo) do total)",
+    "den": "registros com D0360 não nulo e D0111 > 0",
+    "vars": [
+     "D0360"
+    ],
+    "glossario": {
+     "D0360": {
+      "desc": "Rendimento domiciliar per capita",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2022. O valor no mapa é esse número multiplicado por 1,146734, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
     "col": "a1_internet",
     "tipo": "pct",
     "registro": "domicílio",
@@ -280,6 +298,23 @@
     }
    },
    {
+    "col": "a20b_pobreza_real",
+    "tipo": "pct",
+    "registro": "domicílio",
+    "peso": "D0111",
+    "num": "D0360 < {LINHA_REAL}",
+    "den": "D0360 IS NOT NULL",
+    "vars": [
+     "D0360"
+    ],
+    "glossario": {
+     "D0360": {
+      "desc": "Rendimento domiciliar per capita",
+      "codigos": {}
+     }
+    }
+   },
+   {
     "col": "a21_com_defic",
     "tipo": "pct",
     "registro": "domicílio",
@@ -301,6 +336,32 @@
        "1": "Pessoa COM Deficiência",
        "2": "Pessoa SEM Deficiência",
        "9": "Não aplicável - Pessoa com menos de 2 anos de idade"
+      }
+     }
+    }
+   },
+   {
+    "col": "a23_esgoto_adeq",
+    "tipo": "pct",
+    "registro": "domicílio",
+    "peso": "D0111",
+    "num": "D0250 IN (1,2,3)",
+    "den": "D0250 IS NOT NULL",
+    "vars": [
+     "D0250"
+    ],
+    "glossario": {
+     "D0250": {
+      "desc": "Tipo de esgotamento sanitário do domicílio",
+      "codigos": {
+       "1": "Rede geral ou pluvial",
+       "2": "Fossa séptica ou fossa filtro Ligada à rede",
+       "3": "Fossa séptica ou fossa filtro Não ligada à rede",
+       "4": "Fossa rudimentar ou buraco",
+       "5": "Vala",
+       "6": "Rio, lago, córrego ou mar",
+       "7": "Outra forma",
+       "9": "Não tem banheiro nem sanitário"
       }
      }
     }
@@ -383,7 +444,7 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "D0111",
-    "num": "D0250 IN (5,6,9)",
+    "num": "D0250 IN (4,5,6,7,9)",
     "den": "D0250 IS NOT NULL",
     "vars": [
      "D0250"
@@ -853,6 +914,58 @@
     }
    },
    {
+    "col": "c10a_rend_fem",
+    "tipo": "media",
+    "registro": "pessoa",
+    "peso": "P0111",
+    "num": "soma de P1110 quando P1110 > 0 AND P0160 = 2",
+    "den": "P1110 > 0 AND P0160 = 2",
+    "vars": [
+     "P0160",
+     "P1110"
+    ],
+    "glossario": {
+     "P0160": {
+      "desc": "Sexo",
+      "codigos": {
+       "1": "Masculino",
+       "2": "Feminino"
+      }
+     },
+     "P1110": {
+      "desc": "Rendimento recebido em todas as fontes",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2022. O valor no mapa é esse número multiplicado por 1,146734, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
+    "col": "c10b_rend_masc",
+    "tipo": "media",
+    "registro": "pessoa",
+    "peso": "P0111",
+    "num": "soma de P1110 quando P1110 > 0 AND P0160 = 1",
+    "den": "P1110 > 0 AND P0160 = 1",
+    "vars": [
+     "P0160",
+     "P1110"
+    ],
+    "glossario": {
+     "P0160": {
+      "desc": "Sexo",
+      "codigos": {
+       "1": "Masculino",
+       "2": "Feminino"
+      }
+     },
+     "P1110": {
+      "desc": "Rendimento recebido em todas as fontes",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2022. O valor no mapa é esse número multiplicado por 1,146734, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
     "col": "c11_raz_rend_raca",
     "tipo": "composto",
     "registro": "pessoa",
@@ -880,6 +993,66 @@
       "codigos": {}
      }
     }
+   },
+   {
+    "col": "c11a_rend_pretos_pardos",
+    "tipo": "media",
+    "registro": "pessoa",
+    "peso": "P0111",
+    "num": "soma de P1110 quando P1110 > 0 AND P0210 IN (2,4)",
+    "den": "P1110 > 0 AND P0210 IN (2,4)",
+    "vars": [
+     "P0210",
+     "P1110"
+    ],
+    "glossario": {
+     "P0210": {
+      "desc": "Cor ou raça da pessoa, categoria",
+      "codigos": {
+       "1": "Branca",
+       "2": "Preta",
+       "3": "Amarela",
+       "4": "Parda",
+       "5": "Indígena",
+       "9": "Ignorado"
+      }
+     },
+     "P1110": {
+      "desc": "Rendimento recebido em todas as fontes",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2022. O valor no mapa é esse número multiplicado por 1,146734, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
+    "col": "c11b_rend_brancos",
+    "tipo": "media",
+    "registro": "pessoa",
+    "peso": "P0111",
+    "num": "soma de P1110 quando P1110 > 0 AND P0210 = 1",
+    "den": "P1110 > 0 AND P0210 = 1",
+    "vars": [
+     "P0210",
+     "P1110"
+    ],
+    "glossario": {
+     "P0210": {
+      "desc": "Cor ou raça da pessoa, categoria",
+      "codigos": {
+       "1": "Branca",
+       "2": "Preta",
+       "3": "Amarela",
+       "4": "Parda",
+       "5": "Indígena",
+       "9": "Ignorado"
+      }
+     },
+     "P1110": {
+      "desc": "Rendimento recebido em todas as fontes",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2022. O valor no mapa é esse número multiplicado por 1,146734, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
    },
    {
     "col": "c12_ocup_superior",
@@ -919,7 +1092,7 @@
     }
    },
    {
-    "col": "c13_beneficio",
+    "col": "c14_beneficio_amplo",
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "P0111",
@@ -941,6 +1114,23 @@
        "2": "Não",
        "9": "Ignorado"
       }
+     }
+    }
+   },
+   {
+    "col": "c15_palma",
+    "tipo": "nao_agrega",
+    "registro": "domicílio",
+    "peso": "D0111",
+    "num": "soma de D0360 × D0111 dos 10% do topo",
+    "den": "soma de D0360 × D0111 dos 40% da base",
+    "vars": [
+     "D0360"
+    ],
+    "glossario": {
+     "D0360": {
+      "desc": "Rendimento domiciliar per capita",
+      "codigos": {}
      }
     }
    },
@@ -1959,8 +2149,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v013 IN (1, 2), v054, 0)",
-    "den": "IF(v013 IS NOT NULL, v054, 0)",
+    "num": "IF(IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) IN (1, 2), v054, 0)",
+    "den": "IF(IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) IN (-1, 1, 2, 3, 4), v054, 0)",
     "vars": [
      "v013",
      "v054"
@@ -2227,8 +2417,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v013 IN (1), v054, 0)",
-    "den": "IF(v013 IS NOT NULL, v054, 0)",
+    "num": "IF(IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) IN (1), v054, 0)",
+    "den": "IF(IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) IN (-1, 1, 2, 3, 4), v054, 0)",
     "vars": [
      "v013",
      "v054"
@@ -2257,12 +2447,13 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v013 IN (3, 4), v054, 0)",
-    "den": "IF(v013 IS NOT NULL, v054, 0)",
+    "num": "IF(IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) IN (-1, 1, 2, 3, 4) AND IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) NOT IN (1, 2), v054, 0)",
+    "den": "IF(IF(SAFE_CAST(v013 AS INT64) = 5, -1, SAFE_CAST(v013 AS INT64)) IN (-1, 1, 2, 3, 4), v054, 0)",
     "vars": [
      "v013",
      "v054"
     ],
+    "col_extracao": "esgoto_inadequado",
     "glossario": {
      "v013": {
       "desc": "Tipo de instalação sanitária",
@@ -2744,17 +2935,33 @@
     }
    },
    {
-    "col": "c13_beneficio",
+    "col": "c13_aposentadoria",
     "tipo": "pct",
     "registro": "família",
     "peso": "peso amostral",
-    "num": "IF(v043 = 2, v054, 0)",
-    "den": "IF(v043 IS NOT NULL, v054, 0)",
+    "num": "IF(v026 e v027 >= 14 AND v043 = 2, v054, 0)",
+    "den": "IF(v026 e v027 >= 14 AND v043 IS NOT NULL, v054, 0)",
     "vars": [
+     "v026",
+     "v027",
      "v043",
      "v054"
     ],
     "glossario": {
+     "v026": {
+      "desc": "Tipo de idade",
+      "codigos": {
+       "0": "Ignorada",
+       "1": "Declarada em meses",
+       "2": "Presumida em meses",
+       "3": "Declarada em anos",
+       "4": "Presumida em anos"
+      }
+     },
+     "v027": {
+      "desc": "Idade em meses ou anos",
+      "codigos": {}
+     },
      "v043": {
       "desc": "Situação principal de emprego",
       "codigos": {
@@ -2779,13 +2986,29 @@
     "tipo": "pct",
     "registro": "família",
     "peso": "peso amostral",
-    "num": "IF(v043 = 7, v054, 0)",
-    "den": "IF(v043 IS NOT NULL, v054, 0)",
+    "num": "IF(v026 e v027 >= 14 AND v043 = 7, v054, 0)",
+    "den": "IF(v026 e v027 >= 14 AND v043 IS NOT NULL, v054, 0)",
     "vars": [
+     "v026",
+     "v027",
      "v043",
      "v054"
     ],
     "glossario": {
+     "v026": {
+      "desc": "Tipo de idade",
+      "codigos": {
+       "0": "Ignorada",
+       "1": "Declarada em meses",
+       "2": "Presumida em meses",
+       "3": "Declarada em anos",
+       "4": "Presumida em anos"
+      }
+     },
+     "v027": {
+      "desc": "Idade em meses ou anos",
+      "codigos": {}
+     },
      "v043": {
       "desc": "Situação principal de emprego",
       "codigos": {
@@ -2810,13 +3033,29 @@
     "tipo": "pct",
     "registro": "família",
     "peso": "peso amostral",
-    "num": "IF(v047 IN (4, 5), v054, 0)",
-    "den": "IF(v047 IN (1, 2, 3, 4, 5), v054, 0)",
+    "num": "IF(v026 e v027 >= 14 AND v047 IN (4, 5), v054, 0)",
+    "den": "IF(v026 e v027 >= 14 AND v047 IN (1, 2, 3, 4, 5), v054, 0)",
     "vars": [
+     "v026",
+     "v027",
      "v047",
      "v054"
     ],
     "glossario": {
+     "v026": {
+      "desc": "Tipo de idade",
+      "codigos": {
+       "0": "Ignorada",
+       "1": "Declarada em meses",
+       "2": "Presumida em meses",
+       "3": "Declarada em anos",
+       "4": "Presumida em anos"
+      }
+     },
+     "v027": {
+      "desc": "Idade em meses ou anos",
+      "codigos": {}
+     },
      "v047": {
       "desc": "Ocupação que exercia na última semana de referência da pesquisa (25/08/1970 a 31/08/1970)",
       "codigos": {
@@ -2868,14 +3107,30 @@
     "tipo": "pct",
     "registro": "família",
     "peso": "peso amostral",
-    "num": "IF(v047 IN (1, 2, 3), v054, 0)",
-    "den": "IF(v043 IS NOT NULL, v054, 0)",
+    "num": "IF(v026 e v027 >= 14 AND v047 IN (1, 2, 3), v054, 0)",
+    "den": "IF(v026 e v027 >= 14 AND v043 IS NOT NULL, v054, 0)",
     "vars": [
+     "v026",
+     "v027",
      "v043",
      "v047",
      "v054"
     ],
     "glossario": {
+     "v026": {
+      "desc": "Tipo de idade",
+      "codigos": {
+       "0": "Ignorada",
+       "1": "Declarada em meses",
+       "2": "Presumida em meses",
+       "3": "Declarada em anos",
+       "4": "Presumida em anos"
+      }
+     },
+     "v027": {
+      "desc": "Idade em meses ou anos",
+      "codigos": {}
+     },
      "v043": {
       "desc": "Situação principal de emprego",
       "codigos": {
@@ -3223,6 +3478,137 @@
      "v054"
     ],
     "glossario": {
+     "v054": {
+      "desc": "Peso da pessoa",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "f2_resp_mulher",
+    "tipo": "pct",
+    "registro": "família",
+    "peso": "peso amostral",
+    "num": "IF(MAX(IF(v025 = 1, v023, NULL)) = 1, v054, 0)",
+    "den": "IF(MAX(IF(v025 = 1, v023, NULL)) IN (0, 1), v054, 0)",
+    "vars": [
+     "v023",
+     "v025",
+     "v054"
+    ],
+    "glossario": {
+     "v023": {
+      "desc": "Sexo",
+      "codigos": {
+       "0": "Homem",
+       "1": "Mulher"
+      }
+     },
+     "v025": {
+      "desc": "Parentesco ou relação com o chefe da família",
+      "codigos": {
+       "0": "Ignorado",
+       "1": "Chefe da família",
+       "2": "Cônjuge",
+       "3": "Filho",
+       "4": "Pais e sogros",
+       "5": "Outro parente",
+       "6": "Agregado",
+       "7": "Pensionista ou hóspede",
+       "8": "Emrpegado doméstico",
+       "9": "Membro grupo-convidado"
+      }
+     },
+     "v054": {
+      "desc": "Peso da pessoa",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "f2z_chefe_declarado",
+    "tipo": "pct",
+    "registro": "família",
+    "peso": "peso amostral",
+    "num": "IF(MAX(IF(v025 = 1, v023, NULL)) IN (0, 1), v054, 0)",
+    "den": "v054",
+    "vars": [
+     "v023",
+     "v025",
+     "v054"
+    ],
+    "glossario": {
+     "v023": {
+      "desc": "Sexo",
+      "codigos": {
+       "0": "Homem",
+       "1": "Mulher"
+      }
+     },
+     "v025": {
+      "desc": "Parentesco ou relação com o chefe da família",
+      "codigos": {
+       "0": "Ignorado",
+       "1": "Chefe da família",
+       "2": "Cônjuge",
+       "3": "Filho",
+       "4": "Pais e sogros",
+       "5": "Outro parente",
+       "6": "Agregado",
+       "7": "Pensionista ou hóspede",
+       "8": "Emrpegado doméstico",
+       "9": "Membro grupo-convidado"
+      }
+     },
+     "v054": {
+      "desc": "Peso da pessoa",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "f3_idade_resp",
+    "tipo": "media",
+    "registro": "família",
+    "peso": "peso amostral",
+    "num": "IF(MAX(IF(v025 = 1, v026 e v027, NULL)) > 0, v054 * MAX(IF(v025 = 1, v026 e v027, NULL)), 0)",
+    "den": "IF(MAX(IF(v025 = 1, v026 e v027, NULL)) > 0, v054, 0)",
+    "vars": [
+     "v025",
+     "v026",
+     "v027",
+     "v054"
+    ],
+    "glossario": {
+     "v025": {
+      "desc": "Parentesco ou relação com o chefe da família",
+      "codigos": {
+       "0": "Ignorado",
+       "1": "Chefe da família",
+       "2": "Cônjuge",
+       "3": "Filho",
+       "4": "Pais e sogros",
+       "5": "Outro parente",
+       "6": "Agregado",
+       "7": "Pensionista ou hóspede",
+       "8": "Emrpegado doméstico",
+       "9": "Membro grupo-convidado"
+      }
+     },
+     "v026": {
+      "desc": "Tipo de idade",
+      "codigos": {
+       "0": "Ignorada",
+       "1": "Declarada em meses",
+       "2": "Presumida em meses",
+       "3": "Declarada em anos",
+       "4": "Presumida em anos"
+      }
+     },
+     "v027": {
+      "desc": "Idade em meses ou anos",
+      "codigos": {}
+     },
      "v054": {
       "desc": "Peso da pessoa",
       "codigos": {}
@@ -3933,6 +4319,70 @@
     }
    },
    {
+    "col": "a19d_rdpc_p10",
+    "tipo": "mediana",
+    "registro": "domicílio",
+    "peso": "v603 (peso de domicílio)",
+    "num": "separatriz do decimo mais pobre (soma acumulada do peso ate 1/10)",
+    "den": "domicilios particulares com renda utilizavel",
+    "vars": [
+     "v607",
+     "v609",
+     "v610",
+     "v611",
+     "v612",
+     "v613"
+    ],
+    "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
+    "glossario": {
+     "v607": {
+      "desc": "Rendimento bruto na ocupação principal",
+      "codigos": {}
+     },
+     "v609": {
+      "desc": "Renda em dinheiro bruto em outras ocupações",
+      "codigos": {}
+     },
+     "v610": {
+      "desc": "Rendimento recebido do aposentado",
+      "codigos": {}
+     },
+     "v611": {
+      "desc": "Rendimento recebido de aluguel",
+      "codigos": {}
+     },
+     "v612": {
+      "desc": "Rendimento recebido de doações",
+      "codigos": {}
+     },
+     "v613": {
+      "desc": "Rendimento recebido de outros rendimentos",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve cruzeiros de 1980. O valor no mapa é esse número multiplicado por 0,260827, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py.",
+    "apelidos": {
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     }
+    }
+   },
+   {
     "col": "a20_rdpc_baixa",
     "tipo": "pct",
     "registro": "domicílio",
@@ -4047,6 +4497,112 @@
     }
    },
    {
+    "col": "a20b_pobreza_real",
+    "tipo": "pct",
+    "registro": "domicílio",
+    "peso": "v603 (peso de domicílio)",
+    "num": "CASE WHEN part AND renda_ok AND moradores > 0 AND renda/moradores < 2664.30 THEN w ELSE 0 END",
+    "den": "CASE WHEN part AND renda_ok AND moradores > 0 THEN w ELSE 0 END",
+    "vars": [
+     "v201",
+     "v601",
+     "v607",
+     "v609",
+     "v610",
+     "v611",
+     "v612",
+     "v613",
+     "v681"
+    ],
+    "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
+    "glossario": {
+     "v201": {
+      "desc": "Espécie do domicílio",
+      "codigos": {
+       "1": "Particular permanente",
+       "3": "Particular improvisado",
+       "5": "Coletivo permanente",
+       "7": "Coletivo improvisado"
+      }
+     },
+     "v607": {
+      "desc": "Rendimento bruto na ocupação principal",
+      "codigos": {}
+     },
+     "v609": {
+      "desc": "Renda em dinheiro bruto em outras ocupações",
+      "codigos": {}
+     },
+     "v610": {
+      "desc": "Rendimento recebido do aposentado",
+      "codigos": {}
+     },
+     "v611": {
+      "desc": "Rendimento recebido de aluguel",
+      "codigos": {}
+     },
+     "v612": {
+      "desc": "Rendimento recebido de doações",
+      "codigos": {}
+     },
+     "v613": {
+      "desc": "Rendimento recebido de outros rendimentos",
+      "codigos": {}
+     },
+     "v681": {
+      "desc": "Classe de renda total",
+      "codigos": {}
+     }
+    },
+    "apelidos": {
+     "especie": {
+      "expr": "ANY_VALUE(v201)",
+      "desc": "espécie do domicílio",
+      "vars": [
+       "v201"
+      ]
+     },
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "part": {
+      "expr": "especie IN (1,3)",
+      "desc": "domicílio particular",
+      "vars": [
+       "v201"
+      ]
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     },
+     "renda_ok": {
+      "expr": "nenhum morador com v681 = 99 nem rendimento 9999999",
+      "desc": "domicílio com renda utilizável",
+      "vars": [
+       "v681"
+      ],
+      "nota": "Um morador com rendimento ignorado estraga a soma do domicílio inteiro, e a renda per capita é uma divisão desse total."
+     },
+     "w": {
+      "expr": "v603 no domicílio, v604 na pessoa",
+      "desc": "peso amostral",
+      "vars": []
+     }
+    }
+   },
+   {
     "col": "a22_energia",
     "tipo": "pct",
     "registro": "domicílio",
@@ -4079,8 +4635,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v207 IN (2, 4), v603, 0)",
-    "den": "IF(v207 IS NOT NULL, v603, 0)",
+    "num": "IF(IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) IN (2, 4), v603, 0)",
+    "den": "IF(IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) IN (-1, 0, 2, 4, 6), v603, 0)",
     "vars": [
      "v207",
      "v603"
@@ -4405,8 +4961,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v207 IN (2), v603, 0)",
-    "den": "IF(v207 IS NOT NULL, v603, 0)",
+    "num": "IF(IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) IN (2), v603, 0)",
+    "den": "IF(IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) IN (-1, 0, 2, 4, 6), v603, 0)",
     "vars": [
      "v207",
      "v603"
@@ -4435,12 +4991,13 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v207 IN (0, 6), v603, 0)",
-    "den": "IF(v207 IN (0, 2, 4, 6, 8), v603, 0)",
+    "num": "IF(IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) IN (-1, 0, 2, 4, 6) AND IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) NOT IN (2, 4), v603, 0)",
+    "den": "IF(IF(SAFE_CAST(v207 AS INT64) = 8, -1, SAFE_CAST(v207 AS INT64)) IN (-1, 0, 2, 4, 6), v603, 0)",
     "vars": [
      "v207",
      "v603"
     ],
+    "col_extracao": "esgoto_inadequado",
     "glossario": {
      "v207": {
       "desc": "Escoadouro",
@@ -4759,15 +5316,31 @@
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v606 (exceto 999) BETWEEN 6 AND 14 AND (v521 BETWEEN 1 AND 8 OR v522 BETWEEN 1 AND 8), v604, 0)",
+    "num": "IF(v606 (exceto 999) BETWEEN 6 AND 14 AND (v521 BETWEEN 1 AND 8 OR v522 BETWEEN 1 AND 8 OR v520 BETWEEN 1 AND 8), v604, 0)",
     "den": "IF(v606 (exceto 999) BETWEEN 6 AND 14, v604, 0)",
     "vars": [
+     "v520",
      "v521",
      "v522",
      "v604",
      "v606"
     ],
     "glossario": {
+     "v520": {
+      "desc": "Série que frequenta",
+      "codigos": {
+       "0": "Nenhuma",
+       "1": "1ª série",
+       "2": "2ª série",
+       "3": "3ª série",
+       "4": "4ª série",
+       "5": "5ª série",
+       "6": "6ª série",
+       "7": "7ª série",
+       "8": "8ª série",
+       "9": "Sem declaração"
+      }
+     },
      "v521": {
       "desc": "Grau que frequenta",
       "codigos": {
@@ -4813,15 +5386,31 @@
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v606 (exceto 999) BETWEEN 15 AND 17 AND (v521 BETWEEN 1 AND 8 OR v522 BETWEEN 1 AND 8), v604, 0)",
+    "num": "IF(v606 (exceto 999) BETWEEN 15 AND 17 AND (v521 BETWEEN 1 AND 8 OR v522 BETWEEN 1 AND 8 OR v520 BETWEEN 1 AND 8), v604, 0)",
     "den": "IF(v606 (exceto 999) BETWEEN 15 AND 17, v604, 0)",
     "vars": [
+     "v520",
      "v521",
      "v522",
      "v604",
      "v606"
     ],
     "glossario": {
+     "v520": {
+      "desc": "Série que frequenta",
+      "codigos": {
+       "0": "Nenhuma",
+       "1": "1ª série",
+       "2": "2ª série",
+       "3": "3ª série",
+       "4": "4ª série",
+       "5": "5ª série",
+       "6": "6ª série",
+       "7": "7ª série",
+       "8": "8ª série",
+       "9": "Sem declaração"
+      }
+     },
      "v521": {
       "desc": "Grau que frequenta",
       "codigos": {
@@ -5052,12 +5641,12 @@
       },
       "correcao": "Corrigido pelo \"Labels 1980.SPS\" do microdado original. O dicionário da extração repete aqui a escala da v521, que é outra pergunta."
      },
-     "v606": {
-      "desc": "Idade em anos",
-      "codigos": {}
-     },
      "v525": {
       "desc": "Tipo do último curso concluído",
+      "codigos": {}
+     },
+     "v606": {
+      "desc": "Idade em anos",
       "codigos": {}
      }
     },
@@ -5561,12 +6150,12 @@
     }
    },
    {
-    "col": "c13_beneficio",
+    "col": "c13_aposentadoria",
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v606 (exceto 999) >= 10 AND v529 = 3, v604, 0)",
-    "den": "IF(v606 (exceto 999) >= 10, v604, 0)",
+    "num": "IF(v606 (exceto 999) >= 14 AND v529 = 3, v604, 0)",
+    "den": "IF(v606 (exceto 999) >= 14, v604, 0)",
     "vars": [
      "v529",
      "v604",
@@ -5599,12 +6188,75 @@
     }
    },
    {
+    "col": "c15_palma",
+    "tipo": "nao_agrega",
+    "registro": "domicílio",
+    "peso": "v603 (peso de domicílio)",
+    "num": "renda do decimo mais rico dividida pela renda dos quatro decimos mais pobres",
+    "den": "domicilios particulares com renda utilizavel",
+    "vars": [
+     "v607",
+     "v609",
+     "v610",
+     "v611",
+     "v612",
+     "v613"
+    ],
+    "fonte_alt": "microdado original em SPSS (Cesit/Unicamp), via scripts/indicadores_1980.R",
+    "glossario": {
+     "v607": {
+      "desc": "Rendimento bruto na ocupação principal",
+      "codigos": {}
+     },
+     "v609": {
+      "desc": "Renda em dinheiro bruto em outras ocupações",
+      "codigos": {}
+     },
+     "v610": {
+      "desc": "Rendimento recebido do aposentado",
+      "codigos": {}
+     },
+     "v611": {
+      "desc": "Rendimento recebido de aluguel",
+      "codigos": {}
+     },
+     "v612": {
+      "desc": "Rendimento recebido de doações",
+      "codigos": {}
+     },
+     "v613": {
+      "desc": "Rendimento recebido de outros rendimentos",
+      "codigos": {}
+     }
+    },
+    "apelidos": {
+     "moradores": {
+      "expr": "COUNT(*) no domicílio",
+      "desc": "moradores do domicílio",
+      "vars": [],
+      "nota": "A amostra de 1980 seleciona domicílios e enumera todos os moradores, então contar linhas dá o número real de moradores daquele domicílio."
+     },
+     "renda": {
+      "expr": "soma de v607, v609, v610, v611, v612 e v613 de todos os moradores, descartando o código 9999999 de ignorado",
+      "desc": "rendimento domiciliar",
+      "vars": [
+       "v607",
+       "v609",
+       "v610",
+       "v611",
+       "v612",
+       "v613"
+      ]
+     }
+    }
+   },
+   {
     "col": "c1_participacao",
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v606 (exceto 999) >= 10 AND (v529 = 0 OR v529 = 2), v604, 0)",
-    "den": "IF(v606 (exceto 999) >= 10, v604, 0)",
+    "num": "IF(v606 (exceto 999) >= 14 AND (v529 = 0 OR v529 = 2), v604, 0)",
+    "den": "IF(v606 (exceto 999) >= 14, v604, 0)",
     "vars": [
      "v529",
      "v604",
@@ -5641,8 +6293,8 @@
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v606 (exceto 999) >= 10 AND v529 = 2, v604, 0)",
-    "den": "IF(v606 (exceto 999) >= 10 AND (v529 = 0 OR v529 = 2), v604, 0)",
+    "num": "IF(v606 (exceto 999) >= 14 AND v529 = 2, v604, 0)",
+    "den": "IF(v606 (exceto 999) >= 14 AND (v529 = 0 OR v529 = 2), v604, 0)",
     "vars": [
      "v529",
      "v604",
@@ -5679,8 +6331,8 @@
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v606 (exceto 999) >= 10 AND v529 = 0, v604, 0)",
-    "den": "IF(v606 (exceto 999) >= 10, v604, 0)",
+    "num": "IF(v606 (exceto 999) >= 14 AND v529 = 0, v604, 0)",
+    "den": "IF(v606 (exceto 999) >= 14, v604, 0)",
     "vars": [
      "v529",
      "v604",
@@ -6836,6 +7488,49 @@
     }
    },
    {
+    "col": "a19d_rdpc_p10",
+    "tipo": "mediana",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "quantil ponderado 0,1 (soma acumulada do peso até um décimo do total)",
+    "den": "registros com valor não nulo e peso > 0",
+    "vars": [
+     "peso_amostral",
+     "v0111",
+     "v0112",
+     "v2012",
+     "v3072",
+     "v7301"
+    ],
+    "glossario": {
+     "peso_amostral": {
+      "desc": "Peso Amostral",
+      "codigos": {}
+     },
+     "v0111": {
+      "desc": "Número de Homens no Domicílio",
+      "codigos": {}
+     },
+     "v0112": {
+      "desc": "Número de Mulheres no Domicílio",
+      "codigos": {}
+     },
+     "v2012": {
+      "desc": "Rendimento Nominal Médio Mensal Domiciliar",
+      "codigos": {}
+     },
+     "v3072": {
+      "desc": "Idade (em anos completos)",
+      "codigos": {}
+     },
+     "v7301": {
+      "desc": "Peso ou Fator para Expansão da Amostra",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve cruzeiros de setembro de 1991. O valor no mapa é esse número multiplicado por 0,022293, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
     "col": "a19z_v2012_naonulo",
     "tipo": "pct",
     "registro": "domicílio",
@@ -6855,40 +7550,57 @@
    {
     "col": "a20_rdpc_baixa",
     "tipo": "pct",
-    "registro": "pessoa",
+    "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v3049 IN (1, 2, 3), v7301, 0)",
-    "den": "IF(v3049 IS NOT NULL, v7301, 0)",
+    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0 AND IF(v2012 = 9999999999, NULL, v2012) / v0111 + v0112 / 42000 < 0.5, peso_amostral, 0)",
+    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral, 0)",
     "vars": [
-     "v3049",
-     "v7301"
+     "v0111",
+     "v0112",
+     "v2012"
     ],
     "glossario": {
-     "v3049": {
-      "desc": "Faixas de Rendimento Nominal Médio Mensal Familiar Per Capita",
-      "codigos": {
-       "1": "Até 1/8 de salário mínimo",
-       "10": "Mais de 3 a 5 salários mínimos",
-       "11": "Mais de 5 a 10 salários mínimos",
-       "12": "Mais de 10 salários mínimos",
-       "13": "Sem rendimento",
-       "14": "Sem declaração",
-       "2": "Mais de 1/8 a 1/4 salário mínimo",
-       "3": "Mais de 1/4 a 1/2 salário mínimo",
-       "4": "Mais de 1/2 a 3/4 salário mínimo",
-       "5": "Mais de 3/4 a 1 salário mínimo",
-       "6": "Mais de 1 a 1 1/4 salários mínimos",
-       "7": "Mais de 1 1/4 a 1 1/2 salários mínimos",
-       "8": "Mais de 1 1/2 a 2 salários mínimos",
-       "9": "Mais de 2 a 3 salários mínimos"
-      }
+     "v0111": {
+      "desc": "Número de Homens no Domicílio",
+      "codigos": {}
      },
-     "v7301": {
-      "desc": "Peso ou Fator para Expansão da Amostra",
+     "v0112": {
+      "desc": "Número de Mulheres no Domicílio",
+      "codigos": {}
+     },
+     "v2012": {
+      "desc": "Rendimento Nominal Médio Mensal Domiciliar",
       "codigos": {}
      }
     },
     "nota": "Sai de v3049, cujas faixas já são em salários mínimos: os códigos 1, 2 e 3 somam \"até meio salário\". Isso dispensa saber o valor nominal do salário mínimo de 1991, que estava em cruzeiros."
+   },
+   {
+    "col": "a20b_pobreza_real",
+    "tipo": "pct",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0 AND IF(v2012 = 9999999999, NULL, v2012) / v0111 + v0112 < 31172.15, peso_amostral, 0)",
+    "den": "IF(IF(v2012 = 9999999999, NULL, v2012) IS NOT NULL AND v0111 + v0112 > 0, peso_amostral, 0)",
+    "vars": [
+     "v0111",
+     "v0112",
+     "v2012"
+    ],
+    "glossario": {
+     "v0111": {
+      "desc": "Número de Homens no Domicílio",
+      "codigos": {}
+     },
+     "v0112": {
+      "desc": "Número de Mulheres no Domicílio",
+      "codigos": {}
+     },
+     "v2012": {
+      "desc": "Rendimento Nominal Médio Mensal Domiciliar",
+      "codigos": {}
+     }
+    }
    },
    {
     "col": "a21b_com_defic_1991",
@@ -6979,8 +7691,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0206 IN (1, 2, 3), peso_amostral, 0)",
-    "den": "IF(v0206 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) IN (1, 2, 3), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
      "peso_amostral",
      "v0206"
@@ -7065,8 +7777,8 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0206 IN (1), peso_amostral, 0)",
-    "den": "IF(v0206 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) IN (1), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
      "peso_amostral",
      "v0206"
@@ -7097,12 +7809,18 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0206 IN (0, 5), peso_amostral, 0)",
-    "den": "IF(v0206 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6) AND IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) NOT IN (1, 2, 3), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0206 AS INT64) = 0, -1, SAFE_CAST(v0206 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
+     "peso_amostral",
      "v0206"
     ],
+    "col_extracao": "esgoto_inadequado",
     "glossario": {
+     "peso_amostral": {
+      "desc": "Peso Amostral",
+      "codigos": {}
+     },
      "v0206": {
       "desc": "Instalação Sanitária",
       "codigos": {
@@ -7482,7 +8200,7 @@
       "codigos": {}
      }
     },
-    "nota": "EM QUARENTENA: fórmula corrigida aqui, dado do mapa ainda antigo. A versão anterior usava v0324 (série que frequenta) como se fosse nula para quem não estuda; ela nunca é nula, e as duas faixas davam 100,00% contra ~82% publicado. A frequência agora sai de v0325 e v0326 (grau que frequenta, seriado e não seriado), onde quem não estuda tem o código 0 = Nenhum."
+    "nota": "CORRIGIDO NA EXTRAÇÃO, CONFERIR NA RE-RODAGEM: a fórmula abaixo é a nova; o valor no mapa só passa a ser dela depois que a extração rodar de novo. A versão anterior usava v0324 (série que frequenta) como se fosse nula para quem não estuda; ela nunca é nula, e as duas faixas davam 100,00% contra ~82% publicado. A frequência agora sai de v0325 e v0326 (grau que frequenta, seriado e não seriado), onde quem não estuda tem o código 0 = Nenhum."
    },
    {
     "col": "b3z_grau_ambos_nulos",
@@ -7604,7 +8322,7 @@
       "codigos": {}
      }
     },
-    "nota": "EM QUARENTENA: mesmo defeito de v0324 do indicador de 6 a 14 anos, e mesma correção. O dado do mapa ainda é o de antes."
+    "nota": "CORRIGIDO NA EXTRAÇÃO, CONFERIR NA RE-RODAGEM: mesmo defeito de v0324 do indicador de 6 a 14 anos, e mesma correção. O dado do mapa ainda é o de antes."
    },
    {
     "col": "b6_fund_completo",
@@ -7936,7 +8654,7 @@
     "nota": "A fórmula devolve cruzeiros de setembro de 1991. O valor no mapa é esse número multiplicado por 0,022293, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
    },
    {
-    "col": "c13_beneficio",
+    "col": "c13_aposentadoria",
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
@@ -7956,6 +8674,48 @@
        "2": "Pensionista",
        "3": "Aposentado e pensionista"
       }
+     },
+     "v3072": {
+      "desc": "Idade (em anos completos)",
+      "codigos": {}
+     },
+     "v7301": {
+      "desc": "Peso ou Fator para Expansão da Amostra",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "c15_palma",
+    "tipo": "nao_agrega",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "renda somada dos 10% do topo (soma acumulada de peso × valor)",
+    "den": "renda somada dos 40% da base",
+    "vars": [
+     "peso_amostral",
+     "v0111",
+     "v0112",
+     "v2012",
+     "v3072",
+     "v7301"
+    ],
+    "glossario": {
+     "peso_amostral": {
+      "desc": "Peso Amostral",
+      "codigos": {}
+     },
+     "v0111": {
+      "desc": "Número de Homens no Domicílio",
+      "codigos": {}
+     },
+     "v0112": {
+      "desc": "Número de Mulheres no Domicílio",
+      "codigos": {}
+     },
+     "v2012": {
+      "desc": "Rendimento Nominal Médio Mensal Domiciliar",
+      "codigos": {}
      },
      "v3072": {
       "desc": "Idade (em anos completos)",
@@ -8124,13 +8884,32 @@
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
-    "num": "IF(v0353 = 1, v7301, 0)",
-    "den": "IF(v0353 IN (1, 3), v7301, 0)",
+    "num": "IF(v0345 IN (1, 2) AND (v0353 = 1 OR v0350 = 1), v7301, 0)",
+    "den": "IF(v0345 IN (1, 2), v7301, 0)",
     "vars": [
+     "v0345",
+     "v0350",
      "v0353",
      "v7301"
     ],
     "glossario": {
+     "v0345": {
+      "desc": "Trabalhou em todos ou em parte dos últimos 12 meses",
+      "codigos": {
+       "1": "Habitualmente",
+       "2": "Eventualmente",
+       "3": "Não trabalhou"
+      }
+     },
+     "v0350": {
+      "desc": "Posse de Carteira de Trabalho Assinada",
+      "codigos": {
+       "1": "Sim",
+       "2": "Não sabe",
+       "3": "Não tem",
+       "4": "Não é empregado"
+      }
+     },
      "v0353": {
       "desc": "Contribuição para Instituto de Previdência Pública",
       "codigos": {
@@ -9255,6 +10034,44 @@
     }
    },
    {
+    "col": "a19d_rdpc_p10",
+    "tipo": "mediana",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "quantil ponderado 0,1 (soma acumulada do peso até um décimo do total)",
+    "den": "registros com valor não nulo e peso > 0",
+    "vars": [
+     "p001",
+     "peso_amostral",
+     "v4752",
+     "v7100",
+     "v7616"
+    ],
+    "glossario": {
+     "p001": {
+      "desc": "Peso",
+      "codigos": {}
+     },
+     "peso_amostral": {
+      "desc": "Peso amostral",
+      "codigos": {}
+     },
+     "v4752": {
+      "desc": "Idade calculada em anos completos - a partir de 1 ano",
+      "codigos": {}
+     },
+     "v7100": {
+      "desc": "Total de moradores no domicílio",
+      "codigos": {}
+     },
+     "v7616": {
+      "desc": "Total de rendimentos do domicílio particular",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2000. O valor no mapa é esse número multiplicado por 4,591044, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
     "col": "a1c_microcomputador",
     "tipo": "pct",
     "registro": "domicílio",
@@ -9292,6 +10109,28 @@
      },
      "v7617": {
       "desc": "Total de rendimentos do domicílio particular, em salários mínimos",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "a20b_pobreza_real",
+    "tipo": "pct",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "IF(IF(v7100 > 0, v7616 / v7100, NULL) < 151.36, peso_amostral, 0)",
+    "den": "IF(IF(v7100 > 0, v7616 / v7100, NULL) IS NOT NULL, peso_amostral, 0)",
+    "vars": [
+     "v7100",
+     "v7616"
+    ],
+    "glossario": {
+     "v7100": {
+      "desc": "Total de moradores no domicílio",
+      "codigos": {}
+     },
+     "v7616": {
+      "desc": "Total de rendimentos do domicílio particular",
       "codigos": {}
      }
     }
@@ -9399,10 +10238,12 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0211 IN (1, 2), peso_amostral, 0)",
-    "den": "IF(v0211 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) IN (1, 2), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
      "peso_amostral",
+     "v0209",
+     "v0210",
      "v0211"
     ],
     "col_extracao": "esgoto_adequado",
@@ -9410,6 +10251,28 @@
      "peso_amostral": {
       "desc": "Peso amostral",
       "codigos": {}
+     },
+     "v0209": {
+      "desc": "Total de banheiros",
+      "codigos": {
+       "0": "Não tem",
+       "1": "1 banheiro",
+       "2": "2 banheiros",
+       "3": "3 banheiros",
+       "4": "4 banheiros",
+       "5": "5 banheiros",
+       "6": "6 banheiros",
+       "7": "7 banheiros",
+       "8": "8 banheiros",
+       "9": "9 ou mais banheiros"
+      }
+     },
+     "v0210": {
+      "desc": "Existência de sanitário",
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      }
      },
      "v0211": {
       "desc": "Tipo de escoadouro",
@@ -9477,10 +10340,12 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0211 IN (1), peso_amostral, 0)",
-    "den": "IF(v0211 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) IN (1), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
      "peso_amostral",
+     "v0209",
+     "v0210",
      "v0211"
     ],
     "col_extracao": "esgoto_rede",
@@ -9488,6 +10353,28 @@
      "peso_amostral": {
       "desc": "Peso amostral",
       "codigos": {}
+     },
+     "v0209": {
+      "desc": "Total de banheiros",
+      "codigos": {
+       "0": "Não tem",
+       "1": "1 banheiro",
+       "2": "2 banheiros",
+       "3": "3 banheiros",
+       "4": "4 banheiros",
+       "5": "5 banheiros",
+       "6": "6 banheiros",
+       "7": "7 banheiros",
+       "8": "8 banheiros",
+       "9": "9 ou mais banheiros"
+      }
+     },
+     "v0210": {
+      "desc": "Existência de sanitário",
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      }
      },
      "v0211": {
       "desc": "Tipo de escoadouro",
@@ -9507,14 +10394,20 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0211 IN (4, 5) OR (v0209 = 0 AND v0210 = 2), peso_amostral, 0)",
-    "den": "IF(v0209 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6) AND IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) NOT IN (1, 2), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0209 AS INT64) = 0 AND SAFE_CAST(v0210 AS INT64) = 2, -1, SAFE_CAST(v0211 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
+     "peso_amostral",
      "v0209",
      "v0210",
      "v0211"
     ],
+    "col_extracao": "esgoto_inadequado",
     "glossario": {
+     "peso_amostral": {
+      "desc": "Peso amostral",
+      "codigos": {}
+     },
      "v0209": {
       "desc": "Total de banheiros",
       "codigos": {
@@ -10361,7 +11254,7 @@
     }
    },
    {
-    "col": "c13_beneficio",
+    "col": "c13_aposentadoria",
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
@@ -10381,6 +11274,43 @@
      },
      "v4752": {
       "desc": "Idade calculada em anos completos - a partir de 1 ano",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "c15_palma",
+    "tipo": "nao_agrega",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "renda somada dos 10% do topo (soma acumulada de peso × valor)",
+    "den": "renda somada dos 40% da base",
+    "vars": [
+     "p001",
+     "peso_amostral",
+     "v4752",
+     "v7100",
+     "v7616"
+    ],
+    "glossario": {
+     "p001": {
+      "desc": "Peso",
+      "codigos": {}
+     },
+     "peso_amostral": {
+      "desc": "Peso amostral",
+      "codigos": {}
+     },
+     "v4752": {
+      "desc": "Idade calculada em anos completos - a partir de 1 ano",
+      "codigos": {}
+     },
+     "v7100": {
+      "desc": "Total de moradores no domicílio",
+      "codigos": {}
+     },
+     "v7616": {
+      "desc": "Total de rendimentos do domicílio particular",
       "codigos": {}
      }
     }
@@ -10641,7 +11571,7 @@
       }
      }
     },
-    "nota": "EM QUARENTENA: fórmula corrigida aqui, dado do mapa ainda antigo. Mesma armadilha do v0650 de 2010 — v0450 não capta o empregado com carteira, que contribui por definição. Contar só quem respondeu dava 18,74%, contra 54,5% em 1991 e 60,5% em 2010; e 55,13% + 44,87% x 18,74% chega em ~63%, que é o número coerente. O numerador agora inclui a posição na ocupação (v0447 em 1 ou 3)."
+    "nota": "CORRIGIDO NA EXTRAÇÃO, CONFERIR NA RE-RODAGEM: a fórmula abaixo é a nova; o valor no mapa só passa a ser dela depois que a extração rodar de novo. Mesma armadilha do v0650 de 2010 — v0450 não capta o empregado com carteira, que contribui por definição. Contar só quem respondeu dava 18,74%, contra 54,5% em 1991 e 60,5% em 2010; e 55,13% + 44,87% x 18,74% chega em ~63%, que é o número coerente. O numerador agora inclui a posição na ocupação (v0447 em 1 ou 3)."
    },
    {
     "col": "c5z_v0450_naonulo",
@@ -11732,6 +12662,34 @@
     }
    },
    {
+    "col": "a19d_rdpc_p10",
+    "tipo": "mediana",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "quantil ponderado 0,1 (soma acumulada do peso até um décimo do total)",
+    "den": "registros com valor não nulo e peso > 0",
+    "vars": [
+     "peso_amostral",
+     "v6036",
+     "v6531"
+    ],
+    "glossario": {
+     "peso_amostral": {
+      "desc": "Peso amostral",
+      "codigos": {}
+     },
+     "v6036": {
+      "desc": "Idade calculada em anos",
+      "codigos": {}
+     },
+     "v6531": {
+      "desc": "Rendimento domiciliar per capita, em julho de 2010 (em reais)",
+      "codigos": {}
+     }
+    },
+    "nota": "A fórmula devolve reais de 2010. O valor no mapa é esse número multiplicado por 2,365582, que traz para reais de janeiro de 2026 — ver \"Rendimento em reais de 2026\" na página de decisões. O fator sai de scripts/gerar_deflatores.py."
+   },
+   {
     "col": "a1b_micro_internet",
     "tipo": "pct",
     "registro": "domicílio",
@@ -11786,6 +12744,23 @@
     "registro": "domicílio",
     "peso": "peso amostral",
     "num": "IF(v6531 < 255, peso_amostral, 0)",
+    "den": "IF(v6531 IS NOT NULL, peso_amostral, 0)",
+    "vars": [
+     "v6531"
+    ],
+    "glossario": {
+     "v6531": {
+      "desc": "Rendimento domiciliar per capita, em julho de 2010 (em reais)",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "a20b_pobreza_real",
+    "tipo": "pct",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "IF(v6531 < 293.76, peso_amostral, 0)",
     "den": "IF(v6531 IS NOT NULL, peso_amostral, 0)",
     "vars": [
      "v6531"
@@ -11903,10 +12878,12 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0207 IN (1, 2), peso_amostral, 0)",
-    "den": "IF(v0207 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) IN (1, 2), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
      "peso_amostral",
+     "v0205",
+     "v0206",
      "v0207"
     ],
     "col_extracao": "esgoto_adequado",
@@ -11914,6 +12891,28 @@
      "peso_amostral": {
       "desc": "Peso amostral",
       "codigos": {}
+     },
+     "v0205": {
+      "desc": "Número de banheiros de uso exclusivo",
+      "codigos": {
+       "0": "Zero banheiros",
+       "1": "Um banheiro",
+       "2": "Dois banheiros",
+       "3": "Três banheiros",
+       "4": "Quatro banheiros",
+       "5": "Cinco banheiros",
+       "6": "Seis banheiros",
+       "7": "Sete banheiros",
+       "8": "Oito banheiros",
+       "9": "Nove ou mais banheiros"
+      }
+     },
+     "v0206": {
+      "desc": "Sanitário ou buraco para dejeções",
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      }
      },
      "v0207": {
       "desc": "Esgotamento sanitário",
@@ -11988,10 +12987,12 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0207 IN (1), peso_amostral, 0)",
-    "den": "IF(v0207 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) IN (1), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
      "peso_amostral",
+     "v0205",
+     "v0206",
      "v0207"
     ],
     "col_extracao": "esgoto_rede",
@@ -11999,6 +13000,28 @@
      "peso_amostral": {
       "desc": "Peso amostral",
       "codigos": {}
+     },
+     "v0205": {
+      "desc": "Número de banheiros de uso exclusivo",
+      "codigos": {
+       "0": "Zero banheiros",
+       "1": "Um banheiro",
+       "2": "Dois banheiros",
+       "3": "Três banheiros",
+       "4": "Quatro banheiros",
+       "5": "Cinco banheiros",
+       "6": "Seis banheiros",
+       "7": "Sete banheiros",
+       "8": "Oito banheiros",
+       "9": "Nove ou mais banheiros"
+      }
+     },
+     "v0206": {
+      "desc": "Sanitário ou buraco para dejeções",
+      "codigos": {
+       "1": "Sim",
+       "2": "Não"
+      }
      },
      "v0207": {
       "desc": "Esgotamento sanitário",
@@ -12018,14 +13041,20 @@
     "tipo": "pct",
     "registro": "domicílio",
     "peso": "peso amostral",
-    "num": "IF(v0207 IN (4, 5) OR (v0205 = 0 AND v0206 = 2), peso_amostral, 0)",
-    "den": "IF(v0205 IS NOT NULL, peso_amostral, 0)",
+    "num": "IF(IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6) AND IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) NOT IN (1, 2), peso_amostral, 0)",
+    "den": "IF(IF(SAFE_CAST(v0205 AS INT64) = 0 AND SAFE_CAST(v0206 AS INT64) = 2, -1, SAFE_CAST(v0207 AS INT64)) IN (-1, 1, 2, 3, 4, 5, 6), peso_amostral, 0)",
     "vars": [
+     "peso_amostral",
      "v0205",
      "v0206",
      "v0207"
     ],
+    "col_extracao": "esgoto_inadequado",
     "glossario": {
+     "peso_amostral": {
+      "desc": "Peso amostral",
+      "codigos": {}
+     },
      "v0205": {
       "desc": "Número de banheiros de uso exclusivo",
       "codigos": {
@@ -12791,7 +13820,33 @@
     }
    },
    {
-    "col": "c13_beneficio",
+    "col": "c13_aposentadoria",
+    "tipo": "pct",
+    "registro": "pessoa",
+    "peso": "peso amostral",
+    "num": "IF(v6036 >= 14 AND v0656 = 1, peso_amostral, 0)",
+    "den": "IF(v6036 >= 14 AND v0656 IN (0, 1), peso_amostral, 0)",
+    "vars": [
+     "v0656",
+     "v6036"
+    ],
+    "glossario": {
+     "v0656": {
+      "desc": "Em julho de 2010, tinha rendimento mensal habitual de aposentadoria ou pensão de instituto de previdência oficial (federal, estadual ou municipal)",
+      "codigos": {
+       "0": "Não",
+       "1": "Sim",
+       "9": "Ignorado"
+      }
+     },
+     "v6036": {
+      "desc": "Idade calculada em anos",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "c14_beneficio_amplo",
     "tipo": "pct",
     "registro": "pessoa",
     "peso": "peso amostral",
@@ -12830,6 +13885,33 @@
      },
      "v6036": {
       "desc": "Idade calculada em anos",
+      "codigos": {}
+     }
+    }
+   },
+   {
+    "col": "c15_palma",
+    "tipo": "nao_agrega",
+    "registro": "domicílio",
+    "peso": "peso amostral",
+    "num": "renda somada dos 10% do topo (soma acumulada de peso × valor)",
+    "den": "renda somada dos 40% da base",
+    "vars": [
+     "peso_amostral",
+     "v6036",
+     "v6531"
+    ],
+    "glossario": {
+     "peso_amostral": {
+      "desc": "Peso amostral",
+      "codigos": {}
+     },
+     "v6036": {
+      "desc": "Idade calculada em anos",
+      "codigos": {}
+     },
+     "v6531": {
+      "desc": "Rendimento domiciliar per capita, em julho de 2010 (em reais)",
       "codigos": {}
      }
     }
